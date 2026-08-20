@@ -1,1380 +1,214 @@
 <!DOCTYPE html>
-<html lang="my" class="h-full bg-slate-50">
+<html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aroma Craft - AI စမတ် ကော်ဖီဆိုင်နှင့် မှာယူမှုစနစ်</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Telegram Web App SDK for automatic user identification -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Padauk', 'Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        amber: {
-                            50: '#fffbeb',
-                            100: '#fef3c7',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                            800: '#92400e',
-                            900: '#78350f',
-                        },
-                        violet: {
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Scrollbar styles */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        .ai-glow {
-            box-shadow: 0 0 20px -3px rgba(124, 58, 237, 0.3);
-        }
-
-        @keyframes pulse-subtle {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.85; transform: scale(0.98); }
-        }
-        .animate-pulse-subtle {
-            animation: pulse-subtle 3s infinite ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>အအေးမီနူး အော်ဒါမှာရန်</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root { --primary: #0088cc; --bg: #f4f6f8; }
+    body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+    .card { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    h2, h3 { margin-top: 0; color: var(--primary); }
+    .item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+    button { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+    button:disabled { background: #ccc; }
+    input, select { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+    .hidden { display: none; }
+    .qr-img { width: 200px; height: auto; display: block; margin: 10px auto; border-radius: 8px; }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans text-slate-800 bg-slate-50 antialiased selection:bg-amber-500 selection:text-white">
+<body>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 glass-panel border-b border-slate-200/80 shadow-sm transition-all duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
-                    <i class="fa-solid font-bold fa-mug-hot text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">Aroma Craft</h1>
-                    <p class="text-xs font-semibold text-amber-600 tracking-wide uppercase">ကော်ဖီဆိုင်နှင့် AI ဘာရီစတာ</p>
-                </div>
-            </div>
+  <div class="card">
+    <h2>🥤 အအေးမီနူး</h2>
+    <div id="menu-list"></div>
+  </div>
 
-            <!-- Right Buttons -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- AI Barista Button -->
-                <button onclick="toggleAiDrawer()" class="px-3 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                    <span class="hidden sm:inline">AI ဘာရီစတာ မေးရန်</span>
-                </button>
+  <div class="card">
+    <h3>🛒 ရွေးချယ်ထားသော အော်ဒါများ</h3>
+    <div id="cart-list">မရှိသေးပါ</div>
+    <p><strong>စုစုပေါင်း: <span id="total-price">0</span> ကျပ်</strong></p>
+  </div>
 
-                <!-- Telegram Settings Button -->
-                <button onclick="toggleModal('telegramModal')" class="hidden p-2 sm:px-3 sm:py-2 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all text-xs font-medium items-center gap-2 shadow-sm" title="Bot ဆက်တင်များ">
-                    <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
-                    <span class="hidden md:inline">Bot အသိပေးချက် ဆက်တင်</span>
-                </button>
+  <div class="card">
+    <h3>📋 အော်ဒါအချက်အလက်</h3>
+    <label>Telegram Username</label>
+    <input type="text" id="tg-username" placeholder="@username" readonly>
 
-                <!-- Cart Button -->
-                <button onclick="toggleCartDrawer()" class="relative bg-slate-900 text-white hover:bg-slate-800 px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 transition-all shadow-md active:scale-95">
-                    <i class="fa-solid fa-basket-shopping text-amber-400"></i>
-                    <span class="hidden sm:inline">ဈေးဝယ်လှည်း</span>
-                    <span id="cartBadge" class="bg-amber-500 text-slate-900 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center ml-1 transition-all scale-100">0</span>
-                </button>
-            </div>
-        </div>
-    </header>
+    <label>ဖုန်းနံပါတ်</label>
+    <input type="tel" id="phone" placeholder="09xxxxxxxxx">
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
-        <!-- Hero Banner -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-amber-950 to-amber-900 text-white p-6 sm:p-10 shadow-xl border border-amber-900/30">
-            <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-[220px] pointer-events-none">
-                <i class="fa-solid fa-mug-hot"></i>
-            </div>
-            <div class="relative z-10 max-w-2xl space-y-4">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-semibold inline-block">လတ်ဆတ်စွာ ဖျော်စပ်ထားသော · အွန်လိုင်းမှ မှာယူရန်</span>
-                    <span class="bg-violet-500/20 text-violet-300 border border-violet-500/30 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-sparkles text-amber-300"></i> Gemini AI ဖြင့် ထောက်ပံ့ထားသည်
-                    </span>
-                </div>
-                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">အထူးသောက်စရာများနှင့် AI စမတ် အကြံပြုချက်များ</h2>
-                <p class="text-amber-100/80 text-xs sm:text-sm leading-relaxed max-w-lg">ပူပူနွေးနွေး ကော်ဖီများ၊ အေးမြသော သောက်စရာများနှင့် အရသာရှိသော မုန့်များကို သုံးဆောင်ပါ။ ဘာရွေးရမှန်း မသိရင် Gemini AI ဘာရီစတာကို မေးမြန်းလိုက်ပါ။</p>
-                
-                <div class="pt-2 flex flex-wrap gap-3">
-                    <button onclick="toggleModal('moodModal')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg flex items-center gap-2 transition-all active:scale-95">
-                        <i class="fa-solid fa-face-smile-beam"></i>
-                        <span>AI ခံစားချက်အလိုက် ရွေးချယ်မှု</span>
-                    </button>
-                    <button onclick="toggleAiDrawer()" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-md">
-                        <i class="fa-solid fa-comments text-violet-400"></i>
-                        <span>AI ဘာရီစတာနှင့် စကားပြောရန်</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+    <label>ပေးချေမှုပုံစံ</label>
+    <select id="payment-method" onchange="togglePaymentUI()">
+      <option value="cash">ငွေသား (Cash on Delivery)</option>
+      <option value="qr">QR Payment (KBZPay / WavePay)</option>
+    </select>
 
-        <!-- Filter and Search -->
-        <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <!-- Category Tabs -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none" id="categoryTabs">
-                <button onclick="filterCategory('all')" id="tab-all" class="category-btn active border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-amber-500 text-white border-amber-500 shadow-sm">
-                    <i class="fa-solid fa-border-all mr-1.5"></i> မီနူးအားလုံး
-                </button>
-                <button onclick="filterCategory('cold')" id="tab-cold" class="category-btn border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
-                    <i class="fa-solid fa-snowflake text-sky-500 mr-1.5"></i> အေးမြသော အအေးများ
-                </button>
-                <button onclick="filterCategory('hot')" id="tab-hot" class="category-btn border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
-                    <i class="fa-solid fa-fire text-amber-600 mr-1.5"></i> ပူပူနွေးနွေး အပူများ
-                </button>
-                <button onclick="filterCategory('dessert')" id="tab-dessert" class="category-btn border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
-                    <i class="fa-solid fa-cookie-bite text-amber-700 mr-1.5"></i> မုန့်နှင့် အချိုပွဲများ
-                </button>
-            </div>
-
-            <!-- Search Input -->
-            <div class="relative min-w-[240px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="searchInput" oninput="searchMenu()" placeholder="သောက်စရာ သို့မဟုတ် မုန့်များ ရှာရန်..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 shadow-sm transition-all">
-            </div>
-        </div>
-
-        <!-- Menu Grid -->
-        <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <!-- Dynamic menu cards -->
-        </div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-16 space-y-3">
-            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-2xl">
-                <i class="fa-solid fa-glass-water-slash"></i>
-            </div>
-            <h3 class="text-base font-bold text-slate-700">မည်သည့် မီနူးမျှ မတွေ့ရှိပါ</h3>
-            <p class="text-xs text-slate-500 max-w-sm mx-auto">အခြား စာလုံးများဖြင့် ပြန်လည်ရှာဖွေပါ သို့မဟုတ် AI ဘာရီစတာထံမှ အကြံဉာဏ် တောင်းခံပါ။</p>
-        </div>
-    </main>
-
-    <!-- Cart Drawer Container -->
-    <div id="cartDrawerBackdrop" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-    <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl translate-x-full transition-transform duration-300 ease-out flex flex-col">
-        <!-- Drawer Header -->
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-basket-shopping text-amber-500 text-lg"></i>
-                <h2 class="font-bold text-slate-800 text-lg">ရွေးချယ်ထားသော ပစ္စည်းများ</h2>
-            </div>
-            <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm transition-all">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- Cart Items List -->
-        <div id="cartItemsList" class="flex-1 overflow-y-auto p-5 space-y-4 divide-y divide-slate-100">
-            <!-- Dynamic Cart Items -->
-        </div>
-
-        <!-- Empty Cart View -->
-        <div id="emptyCartView" class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
-            <div class="w-16 h-16 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-2xl">
-                <i class="fa-solid fa-mug-saucer"></i>
-            </div>
-            <p class="font-bold text-slate-700 text-base">ဈေးဝယ်လှည်း ဗလာဖြစ်နေသည်</p>
-            <p class="text-xs text-slate-400 max-w-xs">မည်သည့် ကော်ဖီ သို့မဟုတ် မုန့်မျှ မထည့်ရသေးပါ။</p>
-        </div>
-
-        <!-- AI Pairings Section -->
-        <div id="aiPairingSection" class="hidden border-t border-violet-100 bg-gradient-to-b from-violet-50/70 to-slate-50 p-4">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-violet-700 flex items-center gap-1.5">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> AI အကြံပြု တွဲဖက်စာစနစ်
-                </span>
-                <button onclick="getAiCartPairing()" class="text-[11px] text-violet-600 font-semibold hover:underline">
-                    ပြန်စတင်ရန်
-                </button>
-            </div>
-            <div id="aiPairingContent" class="text-xs text-slate-600 space-y-2">
-                <button onclick="getAiCartPairing()" class="w-full py-2 bg-white border border-violet-200 rounded-xl font-medium text-violet-700 hover:bg-violet-50 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-sparkles"></i> AI တွဲဖက်အကြံဉာဏ် တောင်းရန်
-                </button>
-            </div>
-        </div>
-
-        <!-- Cart Footer Checkout -->
-        <div class="p-5 border-t border-slate-100 bg-slate-50 space-y-3">
-            <div class="space-y-1.5 text-sm">
-                <div class="flex justify-between text-slate-500 text-xs">
-                    <span>စုစုပေါင်း တန်ဖိုး</span>
-                    <span id="cartSubtotal" class="font-semibold text-slate-700">¥0.00</span>
-                </div>
-                <div class="flex justify-between text-slate-500 text-xs">
-                    <span>ဝန်ဆောင်ခ/အခွန် (၅%)</span>
-                    <span id="cartTax" class="font-semibold text-slate-700">¥0.00</span>
-                </div>
-                <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
-                    <span>ကျသင့်ငွေ စုစုပေါင်း</span>
-                    <span id="cartTotal" class="text-amber-600">¥0.00</span>
-                </div>
-            </div>
-
-            <button onclick="openCheckoutModal()" id="checkoutBtn" disabled class="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-slate-900 font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                <span>ငွေချေမှု အဆင့်သို့သွားမည်</span>
-                <i class="fa-solid fa-arrow-right text-sm"></i>
-            </button>
-        </div>
-    </aside>
-
-    <!-- AI Barista Chat Drawer -->
-    <div id="aiDrawerBackdrop" onclick="toggleAiDrawer()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-    <aside id="aiDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl translate-x-full transition-transform duration-300 ease-out flex flex-col">
-        <!-- AI Barista Header -->
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-violet-900 to-indigo-900 text-white">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300">
-                    <i class="fa-solid fa-robot text-lg"></i>
-                </div>
-                <div>
-                    <h2 class="font-bold text-white text-base leading-tight">Aroma AI ဘာရီစတာ</h2>
-                    <p class="text-[11px] text-violet-200 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> အွန်လိုင်းတွင် အဆင်သင့်ရှိပါသည်
-                    </p>
-                </div>
-            </div>
-            <button onclick="toggleAiDrawer()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-all">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- AI Chat Messages Area -->
-        <div id="aiChatBox" class="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50">
-            <!-- Welcome Message -->
-            <div class="flex gap-2.5 items-start">
-                <div class="w-7 h-7 rounded-lg bg-violet-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-sm">
-                    <i class="fa-solid fa-mug-hot"></i>
-                </div>
-                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200/80 text-xs text-slate-700 shadow-sm leading-relaxed max-w-[85%] space-y-2">
-                    <p>မင်္ဂလာပါ! ကျွန်တော်ကတော့ <strong>Aroma AI ဘာရီစတာ</strong> ဖြစ်ပါတယ်☕✨</p>
-                    <p>ကော်ဖီစေ့ အရသာ၊ သကြားနည်း သောက်စရာများ သို့မဟုတ် မုန့်တွဲဖက်မှုများအတွက် မေးမြန်းနိုင်ပါတယ်။</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Prompts Chips -->
-        <div class="p-2.5 border-t border-slate-100 bg-white flex items-center gap-1.5 overflow-x-auto scrollbar-none text-[11px]">
-            <button onclick="sendQuickPrompt('ကဖိန်းဓာတ်နည်းပြီး အေးမြဆန်းသစ်တဲ့ သောက်စရာ အကြံပြုပေးပါ')" class="px-2.5 py-1 bg-violet-50 text-violet-700 hover:bg-violet-100 rounded-full whitespace-nowrap transition-colors border border-violet-100 font-medium">
-                🧊 ကဖိန်းနည်း သောက်စရာ
-            </button>
-            <button onclick="sendQuickPrompt('ကာရာမဲလ် မက်ခီယာတိုအေးနဲ့ ဘယ်မုန့်နဲ့ တွဲစားရင် အဆင်ပြေမလဲ?')" class="px-2.5 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-full whitespace-nowrap transition-colors border border-amber-100 font-medium">
-                🥐 မုန့်နှင့် တွဲဖက်မှု
-            </button>
-            <button onclick="sendQuickPrompt('ကဖိန်းမပါတဲ့ အချို သောက်စရာ အကြံပြုပေးပါ')" class="px-2.5 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-full whitespace-nowrap transition-colors border border-slate-200 font-medium">
-                🍫 ကော်ဖီမဟုတ်သော သောက်စရာ
-            </button>
-        </div>
-
-        <!-- AI Input -->
-        <div class="p-3 border-t border-slate-100 bg-white">
-            <form onsubmit="handleAiMessageSubmit(event)" class="flex items-center gap-2">
-                <input type="text" id="aiInput" placeholder="AI ဘာရီစတာအား မေးမြန်းရန်..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 bg-slate-50">
-                <button type="submit" id="aiSendBtn" class="w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-700 text-white flex items-center justify-center text-sm transition-all shadow-md active:scale-95 shrink-0">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    <!-- AI Mood Matcher Modal -->
-    <div id="moodModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100">
-            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-face-smile-beam text-xl"></i>
-                    <h3 class="font-bold text-white text-base">AI ခံစားချက်အလိုက် ရွေးချယ်မှု</h3>
-                </div>
-                <button onclick="toggleModal('moodModal')" class="text-white/80 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    သင်၏ လက်ရှိ ခံစားချက် သို့မဟုတ် အလုပ်အခြေအနေကို ပြောပြပါ၊ Gemini AI က အသင့်တော်ဆုံး သောက်စရာနှင့် မုန့်ကို ရွေးချယ်ပေးပါမည်!
-                </p>
-
-                <!-- Quick Presets -->
-                <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">လက်ရှိ ခံစားချက် ရွေးချယ်ရန်:</label>
-                    <div class="flex flex-wrap gap-2 text-xs">
-                        <button type="button" onclick="selectMoodPreset('အလုပ်လုပ်ရတာ မောပန်းနေပြီး အာရုံစိုက်ဖို့ ကော်ဖီပြင်းပြင်းလိုချင်တယ်')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium transition-colors border border-slate-200">
-                            ⚡ မောပန်း / အာရုံစိုက်ရန်
-                        </button>
-                        <button type="button" onclick="selectMoodPreset('စိတ်ဖိစီးနေလို့ အချို စားပြီး စိတ်ပြေလက်ပျောက် ဖြစ်ချင်တယ်')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium transition-colors border border-slate-200">
-                            🍫 စိတ်အပန်းဖြေ အချို
-                        </button>
-                        <button type="button" onclick="selectMoodPreset('ရာသီဥတု ပူအိုက်လွန်းလို့ အေးမြပြီး အသီးရနံ့ပါတဲ့ အအေး သောက်ချင်တယ်')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium transition-colors border border-slate-200">
-                            ☀️ ရာသီဥတုပူ / အေးမြ လန်းဆန်း
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Custom Input -->
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">သို့မဟုတ် ခံစားချက် ရေးသားရန်:</label>
-                    <textarea id="moodInput" rows="2" placeholder="ဥပမာ - စာမေးပွဲနီးလို့ စာကျက်နေပါတယ်၊ ကဖိန်းမပါဘဲ လန်းဆန်းစေမယ့် သောက်စရာ လိုချင်ပါတယ်..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"></textarea>
-                </div>
-
-                <!-- Result Box -->
-                <div id="moodResultBox" class="hidden p-4 rounded-2xl bg-gradient-to-tr from-amber-50 to-orange-50 border border-amber-200 space-y-2">
-                </div>
-
-                <button onclick="submitMoodRecommendation()" id="moodSubmitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>AI အထူးအကြံပြုချက် ရယူရန်</span>
-                </button>
-            </div>
-        </div>
+    <div id="qr-section" class="hidden">
+      <p style="text-align: center; color: #666;">အောက်ပါ QR ကို စကင်ဖတ်၍ ငွေလွှဲပါ</p>
+      <!-- မိမိတို့၏ QR ဓာတ်ပုံ Link ကို အောက်ပါ src တွင် ပြောင်းပေးပါ -->
+      <img src="https://via.placeholder.com/200x200.png?text=Shop+QR+Code" alt="Payment QR" class="qr-img">
+      <label>ငွေလွှဲပြေစာ (Slip) တင်ပါ</label>
+      <input type="file" id="slip-file" accept="image/*">
     </div>
 
-    <!-- Checkout Modal -->
-    <div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100 max-h-[90vh] flex flex-col">
-            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-paper-plane text-amber-500"></i>
-                    <h3 class="font-bold text-slate-800 text-base">အော်ဒါ အတည်ပြုခြင်း</h3>
-                </div>
-                <button onclick="toggleModal('checkoutModal')" class="text-slate-400 hover:text-slate-600 text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+    <button id="submit-btn" onclick="submitOrder()" style="width: 100%; margin-top: 15px; padding: 12px; font-size: 16px;">အော်ဒါတင်မည်</button>
+  </div>
 
-            <form id="orderForm" onsubmit="submitOrder(event)" class="p-6 overflow-y-auto space-y-4 flex-1">
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">ဝယ်ယူသူ အမည် *</label>
-                        <button type="button" onclick="autofillTelegramUser()" id="tgAutofillBtn" class="text-[11px] font-semibold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2 py-1 rounded-lg transition-all flex items-center gap-1 border border-sky-100">
-                            <i class="fa-brands fa-telegram text-sky-500"></i>
-                            <span id="tgUserLabel">Telegram အကောင့်ဖြင့် ဖြည့်မည်</span>
-                        </button>
-                    </div>
-                    <input type="text" id="custName" required placeholder="ဥပမာ - မောင်မောင် / Sarah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500">
-                </div>
+  <script>
+    // -----------------------------------------------------------
+    // CONFIGURATION (ဆိုင်ဖက်မှ ဖြည့်စွက်ရန် လျှို့ဝှက်အချက်အလက်များ)
+    // -----------------------------------------------------------
+    const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; // တကယ့် Bot Token ထည့်ပါ
+    const CHAT_ID = "YOUR_CHAT_ID_HERE";     // အော်ဒါဝင်မယ့် Group/Channel/Admin Chat ID ထည့်ပါ
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">စားပွဲ / ထိုင်ခုံ နံပါတ် *</label>
-                        <input type="text" id="custTable" required placeholder="ဥပမာ - စားပွဲ A05" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">ဖုန်းနံပါတ်</label>
-                        <input type="tel" id="custPhone" placeholder="မထည့်လည်းရသည်" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500">
-                    </div>
-                </div>
+    const menu = [
+      { id: 1, name: "Bubble Milk Tea", price: 3500 },
+      { id: 2, name: "Iced Americano", price: 2500 },
+      { id: 3, name: "Matcha Latte", price: 4000 },
+      { id: 4, name: "Mango Smoothie", price: 3000 }
+    ];
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">ငွေပေးချေမှု နည်းလမ်း</label>
-                    <select id="custPayment" onchange="toggleQrCodeDisplay()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 bg-white">
-                        <option value="Counter Cash">💵 ကောင်တာတွင် ငွေသားပေးချေမည်</option>
-                        <option value="Mobile Banking / QR Scan">📱 Mobile Banking / QR ပေးချေမည်</option>
-                    </select>
-                </div>
+    let cart = {};
+    const tg = window.Telegram?.WebApp;
 
-                <!-- QR Code Display Box -->
-                <div id="qrPaymentBox" class="hidden p-4 bg-amber-50/80 border border-amber-200 rounded-2xl text-center space-y-2">
-                    <p class="text-xs font-bold text-slate-800 flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-qrcode text-amber-600"></i>
-                        <span>ငွေချေရန် QR စကင်ဖတ်ပါ (Scan QR to Pay)</span>
-                    </p>
-                    <div class="w-44 h-44 mx-auto bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
-                        <img id="qrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=AromaCraftPaymentQR" alt="Payment QR Code" class="w-full h-full object-contain rounded-lg">
-                    </div>
-                    <p class="text-[11px] text-slate-500">KBZPay / WavePay / CBPay / Mobile Banking ဖြင့် စကင်ဖတ် ပေးချေနိုင်ပါသည်။</p>
-                </div>
+    // Telegram Username အလိုအလျောက် ရယူခြင်း
+    document.addEventListener("DOMContentLoaded", () => {
+      if (tg) {
+        tg.ready();
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+          const username = user.username ? `@${user.username}` : `ID: ${user.id} (${user.first_name})`;
+          document.getElementById('tg-username').value = username;
+        } else {
+          document.getElementById('tg-username').value = "@unknown_user";
+        }
+      }
+      renderMenu();
+    });
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">အထူး မှာကြားချက် / ရေခဲ၊ သကြား ပမာဏ</label>
-                    <textarea id="custNotes" rows="2" placeholder="ဥပမာ - ရေခဲနည်းနည်း၊ သကြားတစ်ဝက်၊ ခရင်မ်မပါ..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"></textarea>
-                </div>
-
-                <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-100 flex items-start gap-3">
-                    <i class="fa-brands fa-telegram text-sky-500 text-xl mt-0.5"></i>
-                    <p class="text-xs text-sky-800 leading-relaxed">
-                        အော်ဒါတင်ပြီးပါက အချက်အလက်များကို ဆိုင်ဝန်ထမ်းများ၏ Telegram ချန်နယ်သို့ ချက်ချင်း ပေးပို့သွားပါမည်။
-                    </p>
-                </div>
-
-                <button type="submit" id="submitOrderBtn" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>အော်ဒါ တင်မည်</span>
-                </button>
-            </form>
+    function renderMenu() {
+      const menuContainer = document.getElementById('menu-list');
+      menuContainer.innerHTML = menu.map(item => `
+        <div class="item">
+          <div>
+            <strong>${item.name}</strong><br>
+            <small>${item.price} ကျပ်</small>
+          </div>
+          <button onclick="addToCart(${item.id})">+ ထည့်မည်</button>
         </div>
-    </div>
+      `).join('');
+    }
 
-    <!-- Telegram Configuration Modal -->
-    <div id="telegramModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100">
-            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center gap-2">
-                    <i class="fa-brands fa-telegram text-sky-500 text-xl"></i>
-                    <h3 class="font-bold text-slate-800 text-base">Telegram အသိပေးချက် ဆက်တင်</h3>
-                </div>
-                <button onclick="toggleModal('telegramModal')" class="text-slate-400 hover:text-slate-600 text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      updateCartUI();
+    }
 
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    သင်၏ Telegram Bot API Token နှင့် Chat ID တို့ကို ဖြည့်သွင်းပါက ဝယ်ယူသူများ၏ အော်ဒါများကို ဖုန်း သို့မဟုတ် ချန်နယ်တွင် ချက်ချင်း လက်ခံရရှိနိုင်မည်။
-                </p>
+    function updateCartUI() {
+      const cartContainer = document.getElementById('cart-list');
+      let total = 0;
+      let itemsHtml = '';
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Bot Token</label>
-                    <input type="password" id="tgBotToken" placeholder="ဥပမာ - 123456789:ABCdefGHI..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50">
-                </div>
+      for (const id in cart) {
+        const item = menu.find(m => m.id == id);
+        const itemTotal = item.price * cart[id];
+        total += itemTotal;
+        itemsHtml += `<div>${item.name} x ${cart[id]} = ${itemTotal} ကျပ်</div>`;
+      }
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Chat ID / Admin ID</label>
-                    <input type="text" id="tgChatId" placeholder="ဥပမာ - -100123456789 သို့မဟုတ် 987654321" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50">
-                </div>
+      cartContainer.innerHTML = itemsHtml || 'မရှိသေးပါ';
+      document.getElementById('total-price').innerText = total;
+    }
 
-                <div class="pt-2 flex items-center gap-3">
-                    <button onclick="saveTelegramSettings()" class="flex-1 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-sm rounded-xl transition-all shadow-md">
-                        သိမ်းဆည်းမည်
-                    </button>
-                    <button onclick="testTelegramMessage()" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition-all">
-                        စမ်းသပ်ပို့မည်
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    function togglePaymentUI() {
+      const method = document.getElementById('payment-method').value;
+      const qrSection = document.getElementById('qr-section');
+      if (method === 'qr') {
+        qrSection.classList.remove('hidden');
+      } else {
+        qrSection.classList.add('hidden');
+      }
+    }
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    async function submitOrder() {
+      const username = document.getElementById('tg-username').value;
+      const phone = document.getElementById('phone').value;
+      const payMethod = document.getElementById('payment-method').value;
+      const slipFile = document.getElementById('slip-file').files[0];
 
-    <!-- JS Logic -->
-    <script>
-        // Menu Data (Burmese Translations)
-        const menuItems = [
-            // Cold Drinks
-            {
-                id: 'c1',
-                name: 'ကာရာမဲလ် မက်ခီယာတို (အေး)',
-                category: 'cold',
-                price: 32.00,
-                rating: 4.9,
-                badge: 'လူကြိုက်အများဆုံး',
-                image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=600&q=80',
-                description: 'အီတလီ အက်စ်ပရက်ဆို၊ နို့အေးနှင့် ချိုမြိန်သော ကာရာမဲလ် ဆော့စ် တွဲဖက်ထားသည်။'
-            },
-            {
-                id: 'c2',
-                name: 'အမေရိကာနို (အေး)',
-                category: 'cold',
-                price: 25.00,
-                rating: 4.7,
-                badge: 'လန်းဆန်းစေသော',
-                image: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80',
-                description: 'နှစ်ထပ် ကော်ဖီပြင်းနှင့် ရေခဲတုံးများ ရောစပ်ထားသော သန့်ရှင်းလန်းဆန်းသည့် အရသာ။'
-            },
-            {
-                id: 'c3',
-                name: 'ဂျပန် မက်ချာ လာတေး (အေး)',
-                category: 'cold',
-                price: 35.00,
-                rating: 4.8,
-                badge: 'ရောင်းအားအကောင်းဆုံး',
-                image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80',
-                description: 'ဂျပန် ဥဂျိ မက်ချာ အကွက်အဆန်းနှင့် လတ်ဆတ်သော နို့စိမ်းတို့ သဟဇာတဖြစ်စွာ ပေါင်းစပ်ထားသည်။'
-            },
-            {
-                id: 'c4',
-                name: 'ပက်ရှင်ဖရုနှင့် သရက်သီး ဆော်ဒါ',
-                category: 'cold',
-                price: 28.00,
-                rating: 4.6,
-                badge: 'အသီးရနံ့ ပါသော',
-                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-                description: 'ချိုချဉ် ပက်ရှင်ဖရု၊ သရက်သီးသီးနှင့် အေးမြသော ဆော်ဒါရေခဲ။'
-            },
-            {
-                id: 'c5',
-                name: 'သကြားညို ပုလဲ နို့အေး',
-                category: 'cold',
-                price: 30.00,
-                rating: 4.9,
-                badge: 'အချိုကြိုက်သူများအတွက်',
-                image: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80',
-                description: 'သကြားညိုဖြင့် ကျိုချက်ထားသော စိမ့်စိမ့်ကျောက်ကပ် ပုလဲနှင့် နို့အေးလတ်ဆတ်။'
-            },
+      if (Object.keys(cart).length === 0) {
+        alert("ကျေးဇူးပြု၍ မီနူး အနည်းဆုံးတစ်ခု ရွေးချယ်ပါ။");
+        return;
+      }
+      if (!phone) {
+        alert("ကျေးဇူးပြု၍ ဖုန်းနံပါတ် ဖြည့်စွက်ပါ။");
+        return;
+      }
+      if (payMethod === 'qr' && !slipFile) {
+        alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Slip) ဓာတ်ပုံ တင်ပေးပါ။");
+        return;
+      }
 
-            // Hot Drinks
-            {
-                id: 'h1',
-                name: 'ဒက်ဘယ် အက်စ်ပရက်ဆို (ပူ)',
-                category: 'hot',
-                price: 22.00,
-                rating: 4.9,
-                badge: 'ကော်ဖီပြင်းပြင်း',
-                image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80',
-                description: 'နှစ်ထပ် Espresso ဖြင့် ပြုလုပ်ထားပြီး သစ်သီး/ဟေဇယ်နတ် ရနံ့သင်းပျံ့သည်။'
-            },
-            {
-                id: 'h2',
-                name: 'ကာပူချီနို (ပူ)',
-                category: 'hot',
-                price: 30.00,
-                rating: 4.8,
-                badge: 'ရှေးရိုးရာ မီနူး',
-                image: 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=600&q=80',
-                description: 'ကော်ဖီပြင်း၊ နို့ပူနှင့် ထူထဲသော နို့အမြှုပ် တို့ဖြင့် အချိုးကျ ပြုလုပ်ထားသည်။'
-            },
-            {
-                id: 'h3',
-                name: 'ဗနီလာ လာတေး (ပူ)',
-                category: 'hot',
-                price: 33.00,
-                rating: 4.7,
-                badge: 'မွှေးကြိုင်သော',
-                image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=600&q=80',
-                description: 'မဒါဂတ်စကာ သဘာဝ ဗနီလာ ရနံ့နှင့် နို့အေးမွှေးမွှေး ကော်ဖီ။'
-            },
-            {
-                id: 'h4',
-                name: 'ဘယ်လ်ဂျီယံ ချောကလက် (ပူ)',
-                category: 'hot',
-                price: 28.00,
-                rating: 4.9,
-                badge: 'ကဖိန်းမပါပါ',
-                image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=600&q=80',
-                description: 'ဘယ်လ်ဂျီယံ အမဲရောင် ချောကလက်နှင့် မာရှ်မဲလို ကင်ထားသော သောက်စရာ။'
-            },
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = "အော်ဒါပို့နေသည်...";
 
-            // Desserts
-            {
-                id: 'd1',
-                name: 'ပြင်သစ် ထောပတ် ခရိုဆန့်',
-                category: 'dessert',
-                price: 22.00,
-                rating: 4.8,
-                badge: 'နေ့စဉ် အသစ်ဖုတ်',
-                image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80',
-                description: 'ပြင်သစ် နော်မန်ဒီ ထောပတ်ဖြင့် နေ့စဉ် လတ်ဆတ်စွာ ဖုတ်ထားသော ခရိုဆန့်။'
-            },
-            {
-                id: 'd2',
-                name: 'ချောကလက် လာဗာ ကိတ်',
-                category: 'dessert',
-                price: 38.00,
-                rating: 4.9,
-                badge: 'စားဖိုမှူး အထူးအကြံပြု',
-                image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80',
-                description: 'အလယ်တွင် ပူနွေးသော အမဲရောင် ချောကလက် ရည်များ စီးဆင်းနေသည့် ကိတ်။'
-            }
-        ];
+      let orderText = `🛒 **အော်ဒါအသစ် ရရှိပါသည်!**\n\n`;
+      orderText += `👤 **အသုံးပြုသူ:** ${username}\n`;
+      orderText += `📞 **ဖုန်းနံပါတ်:** ${phone}\n`;
+      orderText += `💳 **ပေးချေမှု:** ${payMethod === 'cash' ? 'ငွေသား (Cash on Delivery)' : 'QR Payment'}\n\n`;
+      orderText += `📝 **မှာယူထားသော စာရင်း:**\n`;
 
-        // Global state
-        let cart = [];
-        let activeCategory = 'all';
+      let total = 0;
+      for (const id in cart) {
+        const item = menu.find(m => m.id == id);
+        const itemTotal = item.price * cart[id];
+        total += itemTotal;
+        orderText += `- ${item.name} x ${cart[id]} (${itemTotal} ကျပ်)\n`;
+      }
+      orderText += `\n💰 **စုစုပေါင်း ကျသင့်ငွေ:** ${total} ကျပ်`;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderMenu();
-            loadTelegramSettings();
-            initCustomerProfile();
-        });
+      try {
+        if (payMethod === 'cash') {
+          // ငွေသားဆိုလျှင် Text Message ချက်ချင်း ပို့မည်
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: CHAT_ID,
+              text: orderText,
+              parse_mode: 'Markdown'
+            })
+          });
+        } else {
+          // QR Payment ဆိုလျှင် Slip ဓာတ်ပုံနှင့်အတူ စာပါ တစ်ခါတည်း ပို့မည်
+          const formData = new FormData();
+          formData.append('@username', user_ID);
+          formData.append('caption', orderText);
+          formData.append('parse_mode', 'Markdown');
+          formData.append('photo', slipFile);
 
-        // Auto-detect Telegram user or retrieve cached customer details
-        function initCustomerProfile() {
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.ready();
-                    window.Telegram.WebApp.expand();
-                    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-                    if (tgUser) {
-                        const fullName = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim();
-                        const handle = tgUser.username ? `@${tgUser.username}` : '';
-                        const displayName = fullName || handle;
-
-                        // Auto-fill input field immediately on detection
-                        const nameInput = document.getElementById('custName');
-                        if (nameInput && displayName) {
-                            nameInput.value = displayName;
-                            localStorage.setItem('aroma_cust_name', displayName);
-                        }
-
-                        const labelBtn = document.getElementById('tgUserLabel');
-                        if (labelBtn) {
-                            labelBtn.innerText = displayName ? `Telegram: ${displayName}` : `Telegram အမည်ဖြင့် ဖြည့်ထားသည်`;
-                        }
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.log("Telegram WebApp detection notice:", err);
-            }
-
-            // Fallback: Restore previously saved profile from LocalStorage if empty
-            const nameInput = document.getElementById('custName');
-            const savedName = localStorage.getItem('aroma_cust_name');
-            if (nameInput && !nameInput.value && savedName) {
-                nameInput.value = savedName;
-            }
-
-            const phoneInput = document.getElementById('custPhone');
-            const savedPhone = localStorage.getItem('aroma_cust_phone');
-            if (phoneInput && !phoneInput.value && savedPhone) {
-                phoneInput.value = savedPhone;
-            }
-
-            const tableInput = document.getElementById('custTable');
-            const savedTable = localStorage.getItem('aroma_cust_table');
-            if (tableInput && !tableInput.value && savedTable) {
-                tableInput.value = savedTable;
-            }
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+            method: 'POST',
+            body: formData
+          });
         }
 
-        function autofillTelegramUser() {
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-                    if (tgUser) {
-                        const fullName = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim();
-                        const handle = tgUser.username ? `@${tgUser.username}` : '';
-                        const displayName = fullName || handle || 'Telegram User';
-
-                        if (displayName) {
-                            document.getElementById('custName').value = displayName;
-                            localStorage.setItem('aroma_cust_name', displayName);
-                            showToast(`Telegram အကောင့် ${displayName} ကို ဖြည့်စွက်ပြီးပါပြီ`, 'success');
-                            return;
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("Autofill error:", err);
-            }
-            
-            // Demo fallback if tested outside Telegram WebApp
-            const demoName = 'မောင်မောင် (Telegram)';
-            document.getElementById('custName').value = demoName;
-            localStorage.setItem('aroma_cust_name', demoName);
-            showToast(`စမ်းသပ် အကောင့် ${demoName} ဖြင့် ဖြည့်စွက်လိုက်ပါပြီ`, 'info');
-        }
-
-        // Gemini API Call
-        async function callGeminiApi(userPrompt, systemInstructionText = "", structuredSchema = null) {
-            const apiKey = ""; // Provided by system runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }]
-            };
-
-            if (systemInstructionText) {
-                payload.systemInstruction = {
-                    parts: [{ text: systemInstructionText }]
-                };
-            }
-
-            if (structuredSchema) {
-                payload.generationConfig = {
-                    responseMimeType: "application/json",
-                    responseSchema: structuredSchema
-                };
-            }
-
-            let attempt = 0;
-            const maxAttempts = 3;
-            let delay = 1000;
-
-            while (attempt < maxAttempts) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`API Error status ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) {
-                        return text;
-                    }
-                    throw new Error("Gemini response empty");
-                } catch (err) {
-                    attempt++;
-                    if (attempt >= maxAttempts) throw err;
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
-        // Render Menu Grid
-        function renderMenu() {
-            const grid = document.getElementById('menuGrid');
-            const emptyState = document.getElementById('emptyState');
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            grid.innerHTML = '';
-
-            const filtered = menuItems.filter(item => {
-                const matchesCat = (activeCategory === 'all' || item.category === activeCategory);
-                const matchesQuery = item.name.toLowerCase().includes(query) || item.description.toLowerCase().includes(query);
-                return matchesCat && matchesQuery;
-            });
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                filtered.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group relative";
-                    card.innerHTML = `
-                        <div class="relative h-48 overflow-hidden bg-slate-100">
-                            <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='https://placehold.co/600x400/fff3dc/d97706?text=${encodeURIComponent(item.name)}'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                ${item.badge}
-                            </span>
-                            <span class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md text-amber-600 text-xs font-bold px-2 py-0.5 rounded-md shadow-sm flex items-center gap-1">
-                                <i class="fa-solid fa-star text-amber-500 text-[10px]"></i> ${item.rating}
-                            </span>
-                        </div>
-                        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-base leading-snug group-hover:text-amber-600 transition-colors">${item.name}</h3>
-                                <p class="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">${item.description}</p>
-                            </div>
-                            <div class="flex items-center justify-between pt-2 border-t border-slate-50">
-                                <span class="text-lg font-extrabold text-slate-900">¥${item.price.toFixed(2)}</span>
-                                <button onclick="addToCart('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 active:scale-95">
-                                    <i class="fa-solid fa-plus"></i> လှည်းထဲထည့်မည်
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-        }
-
-        // Category Filter
-        function filterCategory(category) {
-            activeCategory = category;
-            
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.className = "category-btn border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
-            });
-
-            const activeBtn = document.getElementById(`tab-${category}`);
-            if (activeBtn) {
-                activeBtn.className = "category-btn active border px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all bg-amber-500 text-white border-amber-500 shadow-sm";
-            }
-
-            renderMenu();
-        }
-
-        function searchMenu() {
-            renderMenu();
-        }
-
-        // Cart Actions
-        function addToCart(itemId) {
-            const product = menuItems.find(p => p.id === itemId);
-            if (!product) return;
-
-            const existing = cart.find(c => c.id === itemId);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
-
-            updateCartUI();
-            showToast(`“${product.name}” ကို ဈေးဝယ်လှည်းထဲ ထည့်လိုက်ပါပြီ`, 'success');
-        }
-
-        function updateQuantity(itemId, delta) {
-            const idx = cart.findIndex(c => c.id === itemId);
-            if (idx > -1) {
-                cart[idx].quantity += delta;
-                if (cart[idx].quantity <= 0) {
-                    cart.splice(idx, 1);
-                }
-            }
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const badge = document.getElementById('cartBadge');
-            const cartItemsList = document.getElementById('cartItemsList');
-            const emptyCartView = document.getElementById('emptyCartView');
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            const aiPairingSection = document.getElementById('aiPairingSection');
-
-            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const tax = subtotal * 0.05;
-            const total = subtotal + tax;
-
-            badge.innerText = totalCount;
-
-            cartItemsList.innerHTML = '';
-            if (cart.length === 0) {
-                emptyCartView.classList.remove('hidden');
-                cartItemsList.classList.add('hidden');
-                checkoutBtn.disabled = true;
-                aiPairingSection.classList.add('hidden');
-            } else {
-                emptyCartView.classList.add('hidden');
-                cartItemsList.classList.remove('hidden');
-                checkoutBtn.disabled = false;
-                aiPairingSection.classList.remove('hidden');
-
-                cart.forEach(item => {
-                    const el = document.createElement('div');
-                    el.className = 'pt-3 flex items-center justify-between gap-3';
-                    el.innerHTML = `
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 truncate">${item.name}</h4>
-                            <p class="text-xs text-amber-600 font-semibold">¥${(item.price * item.quantity).toFixed(2)}</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
-                            <button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 bg-white rounded-md text-xs text-slate-700 font-bold shadow-sm flex items-center justify-center hover:bg-slate-200">
-                                <i class="fa-solid fa-minus text-[10px]"></i>
-                            </button>
-                            <span class="text-xs font-bold text-slate-800 px-1">${item.quantity}</span>
-                            <button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 bg-white rounded-md text-xs text-slate-700 font-bold shadow-sm flex items-center justify-center hover:bg-slate-200">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
-                            </button>
-                        </div>
-                    `;
-                    cartItemsList.appendChild(el);
-                });
-            }
-
-            document.getElementById('cartSubtotal').innerText = `¥${subtotal.toFixed(2)}`;
-            document.getElementById('cartTax').innerText = `¥${tax.toFixed(2)}`;
-            document.getElementById('cartTotal').innerText = `¥${total.toFixed(2)}`;
-        }
-
-        // AI Pairings
-        async function getAiCartPairing() {
-            if (cart.length === 0) return;
-
-            const aiPairingContent = document.getElementById('aiPairingContent');
-            aiPairingContent.innerHTML = `
-                <div class="p-3 bg-white rounded-xl border border-violet-100 flex items-center gap-2 text-violet-600 font-medium">
-                    <i class="fa-solid fa-spinner animate-spin"></i>
-                    <span>AI ဘာရီစတာမှ တွဲဖက် မီနူး ရှာဖွေနေပါသည်...</span>
-                </div>
-            `;
-
-            const currentCartNames = cart.map(i => i.name).join(", ");
-            const menuList = menuItems.map(m => `"${m.id}": "${m.name}" (¥${m.price.toFixed(2)})`).join("\n");
-
-            const systemPrompt = `You are a professional coffee and food pairing barista. Based on the customer's current cart, recommend ONE best complementary item from the menu that is NOT currently in their cart.
-Response MUST be valid JSON adhering strictly to the schema. The 'reasoning' MUST be in Burmese language (မြန်မာဘာသာ).
-Available Menu:
-${menuList}`;
-
-            const schema = {
-                type: "OBJECT",
-                properties: {
-                    recommendedItemId: { type: "STRING" },
-                    reasoning: { type: "STRING" }
-                },
-                required: ["recommendedItemId", "reasoning"]
-            };
-
-            try {
-                const userPrompt = `Customer's current cart items: ${currentCartNames}`;
-                const jsonText = await callGeminiApi(userPrompt, systemPrompt, schema);
-                const result = JSON.parse(jsonText);
-
-                const recItem = menuItems.find(m => m.id === result.recommendedItemId);
-                if (recItem) {
-                    aiPairingContent.innerHTML = `
-                        <div class="p-3 bg-white rounded-xl border border-violet-200 space-y-2 shadow-sm">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-800">${recItem.name}</span>
-                                <span class="font-extrabold text-amber-600">¥${recItem.price.toFixed(2)}</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500 leading-snug">${result.reasoning}</p>
-                            <button onclick="addToCart('${recItem.id}')" class="w-full py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition-all shadow-sm">
-                                <i class="fa-solid fa-plus"></i> လှည်းထဲ ချက်ချင်းထည့်မည်
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    aiPairingContent.innerHTML = `<span class="text-slate-500">လက်ရှိ ရွေးချယ်မှုများသည် ပြီးပြည့်စုံနေပါပြီ!</span>`;
-                }
-            } catch (err) {
-                console.error("AI Pairing Error:", err);
-                aiPairingContent.innerHTML = `
-                    <button onclick="getAiCartPairing()" class="w-full py-2 bg-white border border-violet-200 rounded-xl font-medium text-violet-700 hover:bg-violet-50 transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-rotate-right"></i> ပြန်လည် ကြိုးစားမည်
-                    </button>
-                `;
-            }
-        }
-
-        // Toggle Drawers
-        function toggleAiDrawer() {
-            const drawer = document.getElementById('aiDrawer');
-            const backdrop = document.getElementById('aiDrawerBackdrop');
-            const isOpen = !drawer.classList.contains('translate-x-full');
-
-            if (isOpen) {
-                drawer.classList.add('translate-x-full');
-                backdrop.classList.add('opacity-0', 'pointer-events-none');
-            } else {
-                drawer.classList.remove('translate-x-full');
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
-            }
-        }
-
-        function sendQuickPrompt(promptText) {
-            document.getElementById('aiInput').value = promptText;
-            handleAiMessageSubmit(new Event('submit'));
-        }
-
-        // Handle AI Chat
-        async function handleAiMessageSubmit(e) {
-            if (e) e.preventDefault();
-            const input = document.getElementById('aiInput');
-            const sendBtn = document.getElementById('aiSendBtn');
-            const chatBox = document.getElementById('aiChatBox');
-
-            const query = input.value.trim();
-            if (!query) return;
-
-            // User bubble
-            const userMsgEl = document.createElement('div');
-            userMsgEl.className = 'flex gap-2.5 items-start justify-end';
-            userMsgEl.innerHTML = `
-                <div class="bg-violet-600 text-white p-3 rounded-2xl rounded-tr-none text-xs shadow-sm max-w-[85%] leading-relaxed">
-                    ${escapeHtml(query)}
-                </div>
-            `;
-            chatBox.appendChild(userMsgEl);
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // AI Loading bubble
-            const aiThinkingEl = document.createElement('div');
-            aiThinkingEl.className = 'flex gap-2.5 items-start';
-            aiThinkingEl.innerHTML = `
-                <div class="w-7 h-7 rounded-lg bg-violet-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-sm">
-                    <i class="fa-solid fa-mug-hot"></i>
-                </div>
-                <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-slate-200 text-xs text-slate-500 shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-spinner animate-spin text-violet-600"></i>
-                    <span>AI ဘာရီစတာ စဉ်းစားနေပါသည်...</span>
-                </div>
-            `;
-            chatBox.appendChild(aiThinkingEl);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            sendBtn.disabled = true;
-
-            const menuContext = menuItems.map(m => `- ${m.name} (${m.category}): ¥${m.price.toFixed(2)}. ${m.description}`).join("\n");
-            const systemInstruction = `You are the friendly, expert AI Barista for Aroma Craft Coffee Shop.
-ALWAYS respond politely and helpfully in Burmese language (မြန်မာဘာသာ).
-Use our menu items for reference:
-${menuContext}
-
-Keep response concise (2-3 short paragraphs), warm, and engaging!`;
-
-            try {
-                const responseText = await callGeminiApi(query, systemInstruction);
-                aiThinkingEl.remove();
-
-                const aiMsgEl = document.createElement('div');
-                aiMsgEl.className = 'flex gap-2.5 items-start';
-                aiMsgEl.innerHTML = `
-                    <div class="w-7 h-7 rounded-lg bg-violet-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-sm">
-                        <i class="fa-solid fa-mug-hot"></i>
-                    </div>
-                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 text-xs text-slate-700 shadow-sm leading-relaxed max-w-[85%] space-y-2">
-                        ${formatMarkdownToHtml(responseText)}
-                    </div>
-                `;
-                chatBox.appendChild(aiMsgEl);
-            } catch (err) {
-                console.error("AI Assistant Error:", err);
-                aiThinkingEl.remove();
-                const errEl = document.createElement('div');
-                errEl.className = 'flex gap-2.5 items-start';
-                errEl.innerHTML = `
-                    <div class="w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="bg-rose-50 text-rose-800 p-3 rounded-2xl border border-rose-100 text-xs">
-                        ခဏစောင့်ဆိုင်းပြီး ပြန်လည် မေးမြန်းပေးပါရန် အကြောင်းကြားအပ်ပါသည်။
-                    </div>
-                `;
-                chatBox.appendChild(errEl);
-            } finally {
-                sendBtn.disabled = false;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        // Mood Matcher
-        function selectMoodPreset(presetText) {
-            document.getElementById('moodInput').value = presetText;
-        }
-
-        async function submitMoodRecommendation() {
-            const input = document.getElementById('moodInput').value.trim();
-            const btn = document.getElementById('moodSubmitBtn');
-            const resultBox = document.getElementById('moodResultBox');
-
-            if (!input) {
-                showToast("ကျေးဇူးပြု၍ ခံစားချက်ကို ရွေးချယ်ပါ သို့မဟုတ် ရေးသားပါ", "error");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>ဆန်းစစ်နေပါသည်...</span>`;
-            resultBox.classList.remove('hidden');
-            resultBox.innerHTML = `
-                <div class="flex items-center gap-2 text-xs text-amber-800 font-medium">
-                    <i class="fa-solid fa-spinner animate-spin text-amber-600"></i>
-                    <span>သင့်အတွက် သင့်တော်မည့် သောက်စရာ ရွေးချယ်နေပါသည်...</span>
-                </div>
-            `;
-
-            const menuList = menuItems.map(m => `"${m.id}": "${m.name}" (¥${m.price.toFixed(2)})`).join("\n");
-            const systemPrompt = `You are a coffee expert. Based on the customer's mood/state description, match the single best menu item.
-Menu:
-${menuList}
-
-Response MUST be JSON. The 'headline' and 'whyItFits' fields MUST be in Burmese language (မြန်မာဘာသာ).`;
-
-            const schema = {
-                type: "OBJECT",
-                properties: {
-                    matchedItemId: { type: "STRING" },
-                    headline: { type: "STRING" },
-                    whyItFits: { type: "STRING" }
-                },
-                required: ["matchedItemId", "headline", "whyItFits"]
-            };
-
-            try {
-                const jsonText = await callGeminiApi(`Customer mood: "${input}"`, systemPrompt, schema);
-                const res = JSON.parse(jsonText);
-                const item = menuItems.find(m => m.id === res.matchedItemId);
-
-                if (item) {
-                    resultBox.innerHTML = `
-                        <div class="space-y-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded-md">
-                                ✨ ${escapeHtml(res.headline)}
-                            </span>
-                            <div class="flex items-center justify-between pt-1">
-                                <h4 class="font-extrabold text-slate-900 text-sm">${item.name}</h4>
-                                <span class="font-bold text-amber-700 text-sm">¥${item.price.toFixed(2)}</span>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(res.whyItFits)}</p>
-                            <button onclick="addToCart('${item.id}'); toggleModal('moodModal');" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                                <i class="fa-solid fa-basket-shopping"></i> လှည်းထဲ ထည့်မည်
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    resultBox.innerHTML = `<p class="text-xs text-slate-600">သင့်တော်သော မီနူး မတွေ့ရှိပါ။ အခြား ခံစားချက်ကို ရေးသားကြည့်ပါ။</p>`;
-                }
-            } catch (err) {
-                console.error("Mood Matcher error:", err);
-                resultBox.innerHTML = `<p class="text-xs text-rose-600">ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ပြန်လည် ကြိုးစားပါ။</p>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>AI အထူးအကြံပြုချက် ရယူရန်</span>`;
-            }
-        }
-
-        // Drawer / Modal Toggles
-        function toggleCartDrawer() {
-            const drawer = document.getElementById('cartDrawer');
-            const backdrop = document.getElementById('cartDrawerBackdrop');
-            const isOpen = !drawer.classList.contains('translate-x-full');
-
-            if (isOpen) {
-                drawer.classList.add('translate-x-full');
-                backdrop.classList.add('opacity-0', 'pointer-events-none');
-            } else {
-                drawer.classList.remove('translate-x-full');
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
-            }
-        }
-
-        function openCheckoutModal() {
-            if (cart.length === 0) return;
-            initCustomerProfile();
-            toggleCartDrawer();
-            toggleModal('checkoutModal');
-            toggleQrCodeDisplay();
-            
-            // Force auto-fill trigger if input is still empty when modal opens
-            setTimeout(() => {
-                const nameInput = document.getElementById('custName');
-                if (nameInput && !nameInput.value) {
-                    autofillTelegramUser();
-                }
-            }, 100);
-        }
-
-        function toggleQrCodeDisplay() {
-            const paymentSelect = document.getElementById('custPayment');
-            const qrBox = document.getElementById('qrPaymentBox');
-            if (paymentSelect && qrBox) {
-                if (paymentSelect.value === 'Mobile Banking / QR Scan') {
-                    qrBox.classList.remove('hidden');
-                } else {
-                    qrBox.classList.add('hidden');
-                }
-            }
-        }
-
-        function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            const isHidden = modal.classList.contains('opacity-0');
-
-            if (isHidden) {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modal.firstElementChild.classList.remove('scale-95');
-                modal.firstElementChild.classList.add('scale-100');
-            } else {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modal.firstElementChild.classList.remove('scale-100');
-                modal.firstElementChild.classList.add('scale-95');
-            }
-        }
-
-        // Telegram Settings
-        function saveTelegramSettings() {
-            const token = document.getElementById('8643030729:AAEgMw4EiNydJ9eUjjpkmWDKlqkorDAyFjw').value.trim();
-            const chatId = document.getElementById('1949334561').value.trim();
-
-            localStorage.setItem('aroma_tg_token', token);
-            localStorage.setItem('aroma_tg_chat', chatId);
-
-            showToast('Telegram ဆက်တင်များ သိမ်းဆည်းပြီးပါပြီ!', 'success');
-            toggleModal('telegramModal');
-        }
-
-        function loadTelegramSettings() {
-            const token = localStorage.getItem('aroma_tg_token') || '';
-            const chatId = localStorage.getItem('aroma_tg_chat') || '';
-
-            document.getElementById('tgBotToken').value = token;
-            document.getElementById('tgChatId').value = chatId;
-        }
-
-        async function testTelegramMessage() {
-            const token = document.getElementById('tgBotToken').value.trim();
-            const chatId = document.getElementById('tgChatId').value.trim();
-
-            if (!token || !chatId) {
-                showToast('Token နှင့် Chat ID အပြည့်အဝ ဖြည့်သွင်းပါ', 'error');
-                return;
-            }
-
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: '✅ *Aroma Craft မှ စမ်းသပ်အသိပေးချက်ဖြစ်ပါသည်!*',
-                        parse_mode: 'Markdown'
-                    })
-                });
-
-                const data = await res.json();
-                if (data.ok) {
-                    showToast('Telegram စမ်းသပ်စာ ပေးပို့မှု အောင်မြင်သည်!', 'success');
-                } else {
-                    showToast(`ပေးပို့မှု မအောင်မြင်ပါ: ${data.description}`, 'error');
-                }
-            } catch (err) {
-                showToast('Telegram API ချိတ်ဆက်၍ မရပါ', 'error');
-            }
-        }
-
-        // Order Submission
-        async function submitOrder(e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitOrderBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> အော်ဒါ ပို့ဆောင်နေပါသည်...`;
-
-            const name = document.getElementById('custName').value;
-            const table = document.getElementById('custTable').value;
-            const phone = document.getElementById('custPhone').value || 'မဖော်ပြထားပါ';
-            const payment = document.getElementById('custPayment').value;
-            const notes = document.getElementById('custNotes').value || 'အထူးမှာကြားချက်မရှိပါ';
-
-            // Auto-save customer details for future orders
-            localStorage.setItem('aroma_cust_name', name);
-            if (phone !== 'မဖော်ပြထားပါ') localStorage.setItem('aroma_cust_phone', phone);
-            localStorage.setItem('aroma_cust_table', table);
-
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const total = subtotal * 1.05;
-
-            const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
-
-            let itemsText = cart.map(item => `• ${item.quantity}x *${item.name}* (¥${(item.price * item.quantity).toFixed(2)})`).join('\n');
-
-            const message = 
-`🚨 *အော်ဒါအသစ် ရရှိပါသည်* 🚨
-━━━━━━━━━━━━━━━━━━
-🆔 *အော်ဒါနံပါတ်:* \`${orderId}\`
-👤 *ဝယ်ယူသူအမည်:* ${name}
-📍 *စားပွဲနံပါတ်:* ${table}
-📞 *ဖုန်းနံပါတ်:* ${phone}
-💳 *ငွေပေးချေမှု:* ${payment}
-
-🛒 *မှာယူထားသော ပစ္စည်းများ:*
-${itemsText}
-
-💰 *ကျသင့်ငွေ စုစုပေါင်း:* *¥${total.toFixed(2)}*
-📝 *အထူးမှာကြားချက်:* ${notes}
-⏰ *အချိန်:* ${new Date().toLocaleTimeString()}
-━━━━━━━━━━━━━━━━━━`;
-
-            const token = localStorage.getItem('aroma_tg_token');
-            const chatId = localStorage.getItem('aroma_tg_chat');
-
-            if (token && chatId) {
-                try {
-                    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-
-                    const data = await res.json();
-                    if (data.ok) {
-                        finishOrderSuccess(orderId);
-                    } else {
-                        showToast(`Telegram ပေးပို့မှု မအောင်မြင်ပါ: ${data.description}`, 'error');
-                        finishOrderSuccess(orderId, true);
-                    }
-                } catch (err) {
-                    showToast('Telegram ချိတ်ဆက်မှု မရပါ', 'error');
-                    finishOrderSuccess(orderId, true);
-                }
-            } else {
-                console.log("Mock Telegram Order Payload:\n", message);
-                setTimeout(() => {
-                    finishOrderSuccess(orderId, false, true);
-                }, 1000);
-            }
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> အော်ဒါ တင်မည်`;
-        }
-
-        function finishOrderSuccess(orderId, failedTg = false, demoMode = false) {
-            cart = [];
-            updateCartUI();
-            
-            toggleModal('checkoutModal');
-            document.getElementById('orderForm').reset();
-
-            if (demoMode) {
-                showToast(`အော်ဒါ #${orderId} တင်ပြီးပါပြီ! (Telegram တကယ့် ပေးပို့ရန် Bot Token ဖြည့်ပါ)`, 'info');
-            } else if (failedTg) {
-                showToast(`အော်ဒါ #${orderId} သိမ်းဆည်းပြီးပါပြီ (Telegram မရောက်ပါ)`, 'error');
-            } else {
-                showToast(`🎉 အော်ဒါ #${orderId} Telegram သို့ အောင်မြင်စွာ ပို့ဆောင်ပြီးပါပြီ!`, 'success');
-            }
-        }
-
-        // Toast Messages
-        function showToast(msg, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-
-            let bg = 'bg-slate-900 text-white';
-            let icon = 'fa-info-circle';
-
-            if (type === 'success') {
-                bg = 'bg-emerald-600 text-white';
-                icon = 'fa-circle-check';
-            } else if (type === 'error') {
-                bg = 'bg-rose-600 text-white';
-                icon = 'fa-circle-exclamation';
-            }
-
-            toast.className = `${bg} px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2.5 transition-all duration-300 transform translate-y-5 opacity-0 pointer-events-auto`;
-            toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span>${msg}</span>`;
-
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-5', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        // Helpers
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function formatMarkdownToHtml(mdText) {
-            let html = escapeHtml(mdText);
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            html = html.replace(/\n/g, '<br>');
-            return html;
-        }
-    </script>
+        alert("အော်ဒါ တင်ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။");
+        cart = {};
+        updateCartUI();
+        if (tg) tg.close();
+      } catch (err) {
+        alert("အော်ဒါတင်ခြင်း မအောင်မြင်ပါ။ ပြန်လည်ကြိုးစားပါ။");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "အော်ဒါတင်မည်";
+      }
+    }
+  </script>
 </body>
 </html>
