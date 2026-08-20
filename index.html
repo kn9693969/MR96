@@ -1,1229 +1,2117 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星云奶茶店 Milky Way Boba - 智能点餐系统</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & React DOM CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX compilation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>茶韵 · 高级奶茶点单</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f8fafc;
+        /* ========== 全局重置 & 基础 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        /* Custom Scrollbar */
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0b0b1a;
+            color: #f0ece4;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #1a1a2e;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #d4af37;
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+
+        /* ========== 通用组件 ========== */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px 16px 100px;
+            position: relative;
+        }
+        .page {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gold-text {
+            color: #d4af37;
+        }
+        .gold-border {
+            border-color: #d4af37;
+        }
+        .gold-bg {
+            background: linear-gradient(135deg, #d4af37, #b8962e);
         }
         .glass-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(22, 22, 46, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(241, 245, 249, 0.8);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 16px 56px rgba(212, 175, 55, 0.08);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #d4af37, #b8962e);
+            color: #0b0b1a;
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(212, 175, 55, 0.45);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f0ece4;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .btn-danger {
+            background: rgba(180, 40, 40, 0.7);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: rgba(200, 50, 50, 0.9);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #2d8f4e, #1f6b3a);
+            color: #fff;
+        }
+        .btn-success:hover {
+            box-shadow: 0 6px 24px rgba(45, 143, 78, 0.4);
+        }
+        .btn-sm {
+            padding: 10px 18px;
+            font-size: 14px;
+            width: auto;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #a0a0b8;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: #f0ece4;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: inherit;
+        }
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: #d4af37;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+        }
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: #6a6a82;
+        }
+        .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .badge-gold {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+        .badge-green {
+            background: rgba(45, 143, 78, 0.2);
+            color: #4cdb7c;
+        }
+        .badge-red {
+            background: rgba(180, 40, 40, 0.2);
+            color: #f06a6a;
+        }
+        .badge-orange {
+            background: rgba(212, 136, 58, 0.2);
+            color: #e8a84c;
+        }
+
+        /* ========== 顶部导航 ========== */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: sticky;
+            top: 0;
+            background: rgba(11, 11, 26, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 50;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+        }
+        .top-bar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .top-bar .brand i {
+            color: #d4af37;
+            font-size: 26px;
+        }
+        .top-bar .brand span {
+            background: linear-gradient(135deg, #f0d080, #b8962e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .top-bar .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .top-bar .actions button {
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: #c0c0d0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .top-bar .actions button:hover {
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+        }
+        .top-bar .actions .cart-btn {
+            position: relative;
+        }
+        .top-bar .actions .cart-btn .count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #d4af37;
+            color: #0b0b1a;
+            font-size: 11px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== 菜单分类 ========== */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 12px 0 16px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .category-tabs .tab {
+            flex-shrink: 0;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.04);
+            color: #a0a0b8;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .category-tabs .tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f0ece4;
+        }
+        .category-tabs .tab.active {
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        /* ========== 商品卡片 ========== */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 4px;
+        }
+        .menu-item {
+            background: rgba(22, 22, 46, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 16px 14px 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, #f0d080);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .menu-item:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+        .menu-item .icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .menu-item .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f0ece4;
+            margin-bottom: 2px;
+        }
+        .menu-item .desc {
+            font-size: 12px;
+            color: #8888a0;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            min-height: 32px;
+        }
+        .menu-item .bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-item .price {
+            font-size: 17px;
+            font-weight: 700;
+            color: #d4af37;
+        }
+        .menu-item .price small {
+            font-size: 12px;
+            font-weight: 400;
+            color: #8888a0;
+        }
+        .menu-item .add-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-item .add-btn:hover {
+            background: #d4af37;
+            color: #0b0b1a;
+            transform: scale(1.05);
+        }
+
+        /* ========== 购物车浮窗 ========== */
+        .cart-floating {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(22, 22, 46, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 60px;
+            padding: 10px 20px 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            max-width: 92%;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cart-floating.hidden {
+            transform: translateX(-50%) translateY(80px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .cart-floating .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .cart-floating .info .count {
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .cart-floating .info .total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0ece4;
+        }
+        .cart-floating .info .total .currency {
+            color: #d4af37;
+            font-weight: 400;
+        }
+        .cart-floating .checkout-btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #d4af37, #b8962e);
+            color: #0b0b1a;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .cart-floating .checkout-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.3);
+        }
+
+        /* ========== 结账页面 ========== */
+        .checkout-section {
+            margin-top: 8px;
+        }
+        .checkout-section .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #d4af37;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkout-section .section-title i {
+            font-size: 18px;
+        }
+
+        .dining-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .dining-options .option {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .dining-options .option i {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .dining-options .option.active {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.08);
+            color: #d4af37;
+        }
+        .dining-options .option:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .payment-options .option {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .payment-options .option i {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .payment-options .option.active {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.08);
+            color: #d4af37;
+        }
+        .payment-options .option:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(212, 175, 55, 0.2);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .upload-area:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.04);
+        }
+        .upload-area i {
+            font-size: 36px;
+            color: #d4af37;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .upload-area .hint {
+            color: #8888a0;
+            font-size: 14px;
+        }
+        .upload-area img {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        .upload-area .remove-img {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+        .upload-area.has-img .remove-img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .order-summary {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .order-summary .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .order-summary .item-row:last-child {
+            border-bottom: none;
+        }
+        .order-summary .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0 4px;
+            font-size: 18px;
+            font-weight: 700;
+            border-top: 2px solid rgba(212, 175, 55, 0.15);
+            margin-top: 6px;
+        }
+        .order-summary .total-row .price {
+            color: #d4af37;
+        }
+
+        /* ========== 后台 ========== */
+        .admin-login {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .admin-login .lock-icon {
+            font-size: 64px;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+        .admin-login .title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .admin-login .sub {
+            color: #8888a0;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .admin-panel .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .admin-panel .stats .stat-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+        .admin-panel .stats .stat-item .num {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+        }
+        .admin-panel .stats .stat-item .label {
+            font-size: 12px;
+            color: #8888a0;
+            margin-top: 2px;
+        }
+
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .order-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .order-card:hover {
+            border-color: rgba(212, 175, 55, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .order-card .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+        .order-card .top-row .customer {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .order-card .top-row .customer small {
+            font-weight: 400;
+            color: #8888a0;
+            font-size: 13px;
+            margin-left: 6px;
+        }
+        .order-card .top-row .status {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .order-card .items-preview {
+            font-size: 13px;
+            color: #a0a0b8;
+            margin-bottom: 6px;
+        }
+        .order-card .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #8888a0;
+        }
+        .order-card .bottom-row .total {
+            font-weight: 700;
+            color: #d4af37;
+            font-size: 16px;
+        }
+
+        /* ========== 订单详情弹窗 ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 440px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+            animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-content .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-content .modal-title .close {
+            background: none;
+            border: none;
+            color: #8888a0;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.25s;
+        }
+        .modal-content .modal-title .close:hover {
+            color: #f0ece4;
+        }
+        .modal-content .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 14px;
+        }
+        .modal-content .detail-row .label {
+            color: #8888a0;
+        }
+        .modal-content .detail-row .value {
+            color: #f0ece4;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-all;
+        }
+        .modal-content .payment-image {
+            margin: 12px 0;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .modal-content .payment-image img {
+            width: 100%;
+            display: block;
+        }
+        .modal-content .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .modal-content .modal-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* ========== 设置页面 ========== */
+        .settings-group {
+            margin-top: 16px;
+        }
+        .settings-group .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .settings-group .setting-item .info .label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .settings-group .setting-item .info .desc {
+            font-size: 12px;
+            color: #8888a0;
+        }
+        .settings-group .setting-item .value {
+            font-size: 14px;
+            color: #d4af37;
+            font-weight: 500;
+        }
+
+        /* ========== Toast 通知 ========== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            pointer-events: none;
+            max-width: 90%;
+        }
+        .toast {
+            background: rgba(22, 22, 46, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 16px;
+            padding: 14px 24px;
+            color: #f0ece4;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.success {
+            border-color: rgba(45, 143, 78, 0.3);
+        }
+        .toast.error {
+            border-color: rgba(180, 40, 40, 0.3);
+        }
+        .toast i {
+            font-size: 18px;
+        }
+        .toast.success i {
+            color: #4cdb7c;
+        }
+        .toast.error i {
+            color: #f06a6a;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 400px) {
+            .container {
+                padding: 12px 12px 100px;
+            }
+            .menu-grid {
+                gap: 10px;
+            }
+            .menu-item {
+                padding: 12px 10px;
+            }
+            .menu-item .name {
+                font-size: 14px;
+            }
+            .cart-floating {
+                padding: 8px 14px 8px 18px;
+                gap: 10px;
+            }
+            .cart-floating .info .total {
+                font-size: 16px;
+            }
+            .cart-floating .checkout-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .modal-content {
+                padding: 20px 16px;
+            }
+            .admin-panel .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (min-width: 600px) {
+            .container {
+                max-width: 560px;
+            }
+            .menu-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        /* ========== 工具类 ========== */
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mt-24 {
+            margin-top: 24px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .mb-16 {
+            margin-bottom: 16px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .w-full {
+            width: 100%;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8888a0;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #2a2a42;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .empty-state .text {
+            font-size: 15px;
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-amber-100 selection:text-amber-900">
-    <div id="root"></div>
-
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
-
-        // Default Mock Menu Items
-        const DEFAULT_MENU = [
-            {
-                id: '1',
-                name: '黑糖珍珠鲜奶',
-                enName: 'Brown Sugar Boba Fresh Milk',
-                category: 'classic',
-                price: 22,
-                image: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&q=80&w=600',
-                desc: '浓郁手炒黑糖包裹Q弹珍珠，融合纯正高清浓醇鲜牛奶。',
-                popular: true
-            },
-            {
-                id: '2',
-                name: '多肉葡萄芝士',
-                enName: 'Cheesy Fresh Grape Slush',
-                category: 'fruit',
-                price: 26,
-                image: 'https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?auto=format&fit=crop&q=80&w=600',
-                desc: '严选优质巨峰葡萄，手工剥皮去籽，搭配清爽绿茶底与咸香奶盖。',
-                popular: true
-            },
-            {
-                id: '3',
-                name: '杨枝甘露',
-                enName: 'Mango Pomelo Sago',
-                category: 'fruit',
-                price: 25,
-                image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&q=80&w=600',
-                desc: '香甜芒果搭配西柚肉与西米露，加入椰浆，口感多层次爆棚。',
-                popular: false
-            },
-            {
-                id: '4',
-                name: '茉莉飘香原叶乌龙',
-                enName: 'Jasmine Oolong Pure Tea',
-                category: 'pure',
-                price: 16,
-                image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=600',
-                desc: '高山优质茶芽，传统烘焙工艺，回甘悠长，清香袭人。',
-                popular: false
-            },
-            {
-                id: '5',
-                name: '芋泥波波奶茶',
-                enName: 'Taro Paste Milk Tea',
-                category: 'classic',
-                price: 24,
-                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&q=80&w=600',
-                desc: '细腻手打芋泥，搭配香醇奶茶与Q弹芋圆，暖心饱腹首选。',
-                popular: true
-            },
-            {
-                id: '6',
-                name: '生椰拿铁波波',
-                enName: 'Raw Coconut Coffee Boba',
-                category: 'special',
-                price: 28,
-                image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=600',
-                desc: '清甜生椰乳碰撞浓缩咖啡与黑糖珍珠，跨界高颜值新美味。',
-                popular: false
-            }
-        ];
-
-        // Customization Options
-        const SWEETNESS_OPTIONS = ['100% 正常糖', '75% 少糖', '50% 半糖', '30% 微糖', '0% 无糖'];
-        const ICE_OPTIONS = ['正常冰', '少冰', '去冰', '温热'];
-        const TOPPING_OPTIONS = [
-            { name: '黑糖珍珠', price: 3 },
-            { name: '椰果', price: 3 },
-            { name: '咸香奶盖', price: 5 },
-            { name: '手打芋泥', price: 5 },
-            { name: '脆波波', price: 4 }
-        ];
-
-        function App() {
-            // View state: 'customer' | 'admin'
-            const [viewMode, setViewMode] = useState('customer');
-
-            // Store Settings
-            const [settings, setSettings] = useState(() => {
-                const saved = localStorage.getItem('boba_settings');
-                return saved ? JSON.parse(saved) : {
-                    shopName: '星云奶茶店 Milky Way Boba',
-                    botToken: '',
-                    chatId: '',
-                    qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=MILKYWAY_BOBA_PAYMENT_ACCOUNT'
-                };
-            });
-
-            // Active category filter
-            const [selectedCategory, setSelectedCategory] = useState('all');
-            
-            // Menu Items State
-            const [menuItems, setMenuItems] = useState(DEFAULT_MENU);
-
-            // Cart State
-            const [cart, setCart] = useState([]);
-            const [isCartOpen, setIsCartOpen] = useState(false);
-
-            // Customization Modal State
-            const [selectedItem, setSelectedItem] = useState(null);
-            const [customOptions, setCustomOptions] = useState({
-                size: '大杯',
-                sweetness: '50% 半糖',
-                ice: '少冰',
-                selectedToppings: []
-            });
-
-            // Checkout State
-            const [telegramHandle, setTelegramHandle] = useState('');
-            const [paymentMethod, setPaymentMethod] = useState('qr'); // 'cash' or 'qr'
-            const [billSlip, setBillSlip] = useState(null); // Base64 or Blob URL
-            const [isSubmitting, setIsSubmitting] = useState(false);
-
-            // Orders State (Stored in localStorage for simulation)
-            const [orders, setOrders] = useState(() => {
-                const saved = localStorage.getItem('boba_orders');
-                return saved ? JSON.parse(saved) : [];
-            });
-
-            // Notification / Toast State
-            const [toast, setToast] = useState(null);
-
-            // AI Recommendation Modal State
-            const [isAiModalOpen, setIsAiModalOpen] = useState(false);
-            const [aiPrompt, setAiPrompt] = useState('');
-            const [aiLoading, setAiLoading] = useState(false);
-            const [aiResult, setAiResult] = useState(null);
-
-            // Active Order Confirmation Modal
-            const [activeOrderConfirmation, setActiveOrderConfirmation] = useState(null);
-
-            // Save Settings
-            useEffect(() => {
-                localStorage.setItem('boba_settings', JSON.stringify(settings));
-            }, [settings]);
-
-            // Save Orders
-            useEffect(() => {
-                localStorage.setItem('boba_orders', JSON.stringify(orders));
-            }, [orders]);
-
-            const showToast = (message, type = 'info') => {
-                setToast({ message, type });
-                setTimeout(() => setToast(null), 3500);
-            };
-
-            const handleOpenCustomize = (item) => {
-                setSelectedItem(item);
-                setCustomOptions({
-                    size: '大杯',
-                    sweetness: '50% 半糖',
-                    ice: '少冰',
-                    selectedToppings: []
-                });
-            };
-
-            const toggleTopping = (topping) => {
-                setCustomOptions(prev => {
-                    const exists = prev.selectedToppings.some(t => t.name === topping.name);
-                    if (exists) {
-                        return { ...prev, selectedToppings: prev.selectedToppings.filter(t => t.name !== topping.name) };
-                    } else {
-                        return { ...prev, selectedToppings: [...prev.selectedToppings, topping] };
-                    }
-                });
-            };
-
-            const handleAddToCart = () => {
-                if (!selectedItem) return;
-                
-                const toppingCost = customOptions.selectedToppings.reduce((sum, t) => sum + t.price, 0);
-                const sizeExtra = customOptions.size === '超大杯' ? 4 : 0;
-                const unitPrice = selectedItem.price + toppingCost + sizeExtra;
-
-                const cartItem = {
-                    cartId: Date.now() + Math.random().toString(),
-                    id: selectedItem.id,
-                    name: selectedItem.name,
-                    price: unitPrice,
-                    size: customOptions.size,
-                    sweetness: customOptions.sweetness,
-                    ice: customOptions.ice,
-                    toppings: customOptions.selectedToppings.map(t => t.name),
-                    quantity: 1
-                };
-
-                setCart(prev => [...prev, cartItem]);
-                setSelectedItem(null);
-                showToast(`已加入购物车: ${selectedItem.name}`, 'success');
-            };
-
-            const updateCartQuantity = (cartId, delta) => {
-                setCart(prev => prev.map(item => {
-                    if (item.cartId === cartId) {
-                        const newQty = item.quantity + delta;
-                        return newQty > 0 ? { ...item, quantity: newQty } : null;
-                    }
-                    return item;
-                }).filter(Boolean));
-            };
-
-            const cartTotal = useMemo(() => {
-                return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            }, [cart]);
-
-            const handleBillSlipUpload = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast('图片文件不能超过 5MB', 'error');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setBillSlip(reader.result);
-                    showToast('结账单凭证上传成功！', 'success');
-                };
-                reader.readAsDataURL(file);
-            };
-
-            const sendTelegramNotification = async (order) => {
-                if (!settings.botToken || !settings.chatId) {
-                    console.log('Telegram Bot Token or Chat ID not configured. Skipping live Telegram dispatch.');
-                    return;
-                }
-
-                const itemsText = order.items.map(i => 
-                    `• *${i.name}* x${i.quantity} (${i.size}, ${i.sweetness}, ${i.ice}${i.toppings.length ? ', 加料:' + i.toppings.join('+') : ''}) - ¥${i.price * i.quantity}`
-                ).join('\n');
-
-                const message = 
-`🚨 *【新订单通知】* 
-────────────────
-🆔 *订单号*: \`#${order.id}\`
-👤 *Telegram*: ${order.telegramHandle}
-💵 *支付方式*: ${order.paymentMethod === 'qr' ? '扫码付款 (待审核 ⏳)' : '现金支付 (现场收取 💵)'}
-💰 *总金额*: *¥${order.totalAmount}*
-📌 *状态*: ${order.status === 'PENDING_VERIFICATION' ? '⚠️ 待店主审核账单' : '✅ 待接单制作'}
-
-📋 *饮品明细*:
-${itemsText}
-
-⏰ *下单时间*: ${order.createdAt}
-────────────────
-${order.paymentMethod === 'qr' ? '👉 请进入后台检查客人上传的 Bill Slip 结账单凭证！' : '👉 现金订单，请确认备餐！'}`;
-
-                try {
-                    const url = `https://api.telegram.org/bot${settings.botToken}/sendMessage`;
-                    await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: settings.chatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-                } catch (err) {
-                    console.error('Failed to send Telegram notification:', err);
-                }
-            };
-
-            const handleSubmitOrder = async () => {
-                // Validation
-                let handle = telegramHandle.trim();
-                if (!handle) {
-                    showToast('请输入您的 Telegram @username', 'error');
-                    return;
-                }
-                if (!handle.startsWith('@')) {
-                    handle = '@' + handle;
-                }
-
-                if (cart.length === 0) {
-                    showToast('购物车是空的', 'error');
-                    return;
-                }
-
-                if (paymentMethod === 'qr' && !billSlip) {
-                    showToast('扫码付款必须上传 Bill Slip 结账单凭证', 'error');
-                    return;
-                }
-
-                setIsSubmitting(true);
-
-                const newOrder = {
-                    id: 'ORD' + Math.floor(100000 + Math.random() * 900000),
-                    telegramHandle: handle,
-                    items: [...cart],
-                    totalAmount: cartTotal,
-                    paymentMethod,
-                    billSlip: paymentMethod === 'qr' ? billSlip : null,
-                    // Cash orders are CONFIRMED immediately or PENDING_CASH; QR orders MUST be verified by store owner
-                    status: paymentMethod === 'qr' ? 'PENDING_VERIFICATION' : 'CONFIRMED',
-                    createdAt: new Date().toLocaleString('zh-CN')
-                };
-
-                // Simulate brief network delay
-                await new Promise(r => setTimeout(r, 600));
-
-                setOrders(prev => [newOrder, ...prev]);
-                await sendTelegramNotification(newOrder);
-
-                // Reset Checkout State
-                setCart([]);
-                setBillSlip(null);
-                setIsCartOpen(false);
-                setIsSubmitting(false);
-
-                // Open Order Confirmation Popup
-                setActiveOrderConfirmation(newOrder);
-                showToast('下单申请已提交！', 'success');
-            };
-
-            const handleApproveOrder = (orderId) => {
-                setOrders(prev => prev.map(o => {
-                    if (o.id === orderId) {
-                        return { ...o, status: 'CONFIRMED' };
-                    }
-                    return o;
-                }));
-                showToast(`订单 #${orderId} 凭证审核通过！`, 'success');
-            };
-
-            const handleRejectOrder = (orderId) => {
-                setOrders(prev => prev.map(o => {
-                    if (o.id === orderId) {
-                        return { ...o, status: 'REJECTED' };
-                    }
-                    return o;
-                }));
-                showToast(`订单 #${orderId} 已驳回`, 'info');
-            };
-
-            const handleAskAi = async () => {
-                if (!aiPrompt.trim()) {
-                    showToast('请输入您现在的状态或口感偏好', 'error');
-                    return;
-                }
-
-                setAiLoading(true);
-                setAiResult(null);
-
-                const systemInstruction = "你是一位高级奶茶调饮师与美食专家。根据用户的描述，从给定的菜单中推荐1-2款最符合需求的奶茶，并给出定制参数（糖度、冰量、加料建议）以及一句温馨懂你的推荐理由。格式要求为JSON代码块。";
-                
-                const userQuery = `菜单内容: ${JSON.stringify(menuItems.map(i => ({ id: i.id, name: i.name, desc: i.desc, price: i.price })))}
-我的需求/心情/偏好: "${aiPrompt}"
-
-请返回如下格式的JSON:
-{
-  "recommendations": [
-    {
-      "menuItemId": "项目ID",
-      "name": "奶茶名称",
-      "reason": "推荐理由",
-      "suggestedOptions": {
-        "sweetness": "50% 半糖",
-        "ice": "少冰",
-        "size": "大杯",
-        "toppings": ["黑糖珍珠"]
-      }
-    }
-  ],
-  "friendlyMessage": "一句给客人的贴心暖心话"
-}`;
-
-                try {
-                    const apiKey = ""; // Canvas runtime injection fallback
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-preview:generateContent?key=${apiKey}`;
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: userQuery }] }],
-                            systemInstruction: { parts: [{ text: systemInstruction }] },
-                            generationConfig: { responseMimeType: "application/json" }
-                        })
-                    });
-
-                    const data = await response.json();
-                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) {
-                        const parsed = JSON.parse(text);
-                        setAiResult(parsed);
-                    } else {
-                        throw new Error('未获取到有效的AI建议');
-                    }
-                } catch (err) {
-                    console.error('AI Recommendation failed:', err);
-                    showToast('AI 推荐暂时遇到问题，请直接选购吧', 'error');
-                } finally {
-                    setAiLoading(false);
-                }
-            };
-
-            const addAiRecommendationToCart = (rec) => {
-                const item = menuItems.find(m => m.id === rec.menuItemId || m.name === rec.name);
-                if (!item) {
-                    showToast('未找到对应的饮品', 'error');
-                    return;
-                }
-
-                const toppings = rec.suggestedOptions?.toppings || [];
-                const matchedToppings = TOPPING_OPTIONS.filter(t => toppings.includes(t.name));
-                const toppingCost = matchedToppings.reduce((sum, t) => sum + t.price, 0);
-
-                const cartItem = {
-                    cartId: Date.now() + Math.random().toString(),
-                    id: item.id,
-                    name: item.name,
-                    price: item.price + toppingCost,
-                    size: rec.suggestedOptions?.size || '大杯',
-                    sweetness: rec.suggestedOptions?.sweetness || '50% 半糖',
-                    ice: rec.suggestedOptions?.ice || '少冰',
-                    toppings: matchedToppings.map(t => t.name),
-                    quantity: 1
-                };
-
-                setCart(prev => [...prev, cartItem]);
-                setIsAiModalOpen(false);
-                showToast(`已按AI建议加入: ${item.name}`, 'success');
-            };
-
-            // Category list filter
-            const filteredMenu = useMemo(() => {
-                if (selectedCategory === 'all') return menuItems;
-                return menuItems.filter(item => item.category === selectedCategory);
-            }, [menuItems, selectedCategory]);
-
-            return (
-                <div className="min-h-screen pb-20">
-                    {/* Header Bar */}
-                    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
-                        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-400 flex items-center justify-center text-white text-xl shadow-md shadow-amber-500/20">
-                                    🧋
-                                </div>
-                                <div>
-                                    <h1 className="font-bold text-slate-900 text-lg leading-tight">{settings.shopName}</h1>
-                                    <span className="text-xs text-slate-500 font-medium">线上轻松点 • 快速配送/取餐</span>
-                                </div>
-                            </div>
-
-                            {/* Nav buttons */}
-                            <div className="flex items-center space-x-2">
-                                {/* AI Recommender Trigger */}
-                                <button
-                                    onClick={() => setIsAiModalOpen(true)}
-                                    className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200 text-purple-700 text-xs font-semibold hover:bg-purple-100 transition flex items-center space-x-1.5 shadow-xs"
-                                >
-                                    <span>✨</span>
-                                    <span>AI 灵感点餐</span>
-                                </button>
-
-                                {/* Switch View Mode */}
-                                <button
-                                    onClick={() => setViewMode(viewMode === 'customer' ? 'admin' : 'customer')}
-                                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition border ${
-                                        viewMode === 'admin' 
-                                        ? 'bg-slate-900 text-white border-slate-900' 
-                                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
-                                    }`}
-                                >
-                                    {viewMode === 'customer' ? '⚙️ 店主后台' : '🧋 切换到客人点餐'}
-                                </button>
-
-                                {/* Cart Icon (Customer mode) */}
-                                {viewMode === 'customer' && (
-                                    <button
-                                        onClick={() => setIsCartOpen(true)}
-                                        className="relative p-2.5 rounded-2xl bg-amber-50 text-amber-900 hover:bg-amber-100 transition border border-amber-200"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                        </svg>
-                                        {cart.length > 0 && (
-                                            <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                                                {cart.reduce((a, b) => a + b.quantity, 0)}
-                                            </span>
-                                        )}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Toast Notification */}
-                    {toast && (
-                        <div className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-2xl shadow-xl border flex items-center space-x-2 transition-all duration-300 ${
-                            toast.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-800' :
-                            toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
-                            'bg-slate-900 text-white border-slate-800'
-                        }`}>
-                            <span>{toast.type === 'error' ? '❌' : toast.type === 'success' ? '✅' : 'ℹ️'}</span>
-                            <span className="text-sm font-medium">{toast.message}</span>
-                        </div>
-                    )}
-
-                    {/* MAIN CONTENT VIEWS */}
-                    {viewMode === 'customer' ? (
-                        <main className="max-w-6xl mx-auto px-4 py-6">
-                            {/* Banner / Hero */}
-                            <div className="relative rounded-3xl bg-gradient-to-r from-amber-500 via-rose-400 to-pink-500 p-6 md:p-8 text-white overflow-hidden shadow-lg mb-8">
-                                <div className="relative z-10 max-w-xl">
-                                    <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold tracking-wide uppercase mb-3">
-                                        🧋 现熬黑糖 • 新鲜果萃
-                                    </span>
-                                    <h2 className="text-2xl md:text-3xl font-extrabold leading-tight mb-2">
-                                        探索每一口细腻甜润与茶香
-                                    </h2>
-                                    <p className="text-white/90 text-xs md:text-sm mb-4">
-                                        挑选您最爱的奶茶，扫码付款或现金结账。扫码请上传 Bill Slip，店主即刻审核确认！
-                                    </p>
-                                    <button 
-                                        onClick={() => setIsAiModalOpen(true)}
-                                        className="px-4 py-2 rounded-2xl bg-white text-slate-900 text-xs font-bold shadow-md hover:bg-amber-50 transition flex items-center space-x-2"
-                                    >
-                                        <span>✨ 不知道喝什么？让 AI 为您推荐</span>
-                                    </button>
-                                </div>
-                                <div className="absolute right-[-20px] bottom-[-20px] opacity-20 md:opacity-30 text-9xl pointer-events-none select-none">
-                                    🧋
-                                </div>
-                            </div>
-
-                            {/* Category Filter Tabs */}
-                            <div className="flex items-center space-x-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
-                                {[
-                                    { id: 'all', name: '全部饮品', icon: '✨' },
-                                    { id: 'classic', name: '经典奶茶', icon: '🧋' },
-                                    { id: 'fruit', name: '鲜果特饮', icon: '🍇' },
-                                    { id: 'pure', name: '原叶茶萃', icon: '🍃' },
-                                    { id: 'special', name: '生椰&咖啡', icon: '🥥' }
-                                ].map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setSelectedCategory(cat.id)}
-                                        className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition flex items-center space-x-1.5 ${
-                                            selectedCategory === cat.id
-                                            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
-                                        }`}
-                                    >
-                                        <span>{cat.icon}</span>
-                                        <span>{cat.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Drinks Menu Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                                {filteredMenu.map(item => (
-                                    <div 
-                                        key={item.id} 
-                                        className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group"
-                                    >
-                                        <div className="relative h-48 overflow-hidden bg-slate-100">
-                                            <img 
-                                                src={item.image} 
-                                                alt={item.name} 
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&q=80&w=600'; }}
-                                            />
-                                            {item.popular && (
-                                                <span className="absolute top-3 left-3 bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-sm">
-                                                    🔥 店长推荐
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="p-5 flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <div className="flex items-start justify-between mb-1">
-                                                    <h3 className="font-bold text-slate-900 text-base">{item.name}</h3>
-                                                    <span className="text-amber-600 font-extrabold text-base">¥{item.price}</span>
-                                                </div>
-                                                <p className="text-xs text-slate-400 font-medium mb-2">{item.enName}</p>
-                                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">{item.desc}</p>
-                                            </div>
-
-                                            <button
-                                                onClick={() => handleOpenCustomize(item)}
-                                                className="w-full py-2.5 rounded-2xl bg-slate-900 hover:bg-amber-500 text-white text-xs font-bold transition duration-200 flex items-center justify-center space-x-1.5 shadow-md"
-                                            >
-                                                <span>＋ 选规格 / 点餐</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </main>
-                    ) : (
-                        /* STORE OWNER ADMIN DASHBOARD */
-                        <main className="max-w-6xl mx-auto px-4 py-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                                <div>
-                                    <h2 className="text-xl font-bold text-slate-900">店主管理后台 Store Admin</h2>
-                                    <p className="text-xs text-slate-500">实时查看订单、审核客人上传的扫码付款凭证 (Bill Slip) 并配置通知。</p>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-100 text-amber-800">
-                                        待审核订单: {orders.filter(o => o.status === 'PENDING_VERIFICATION').length} 件
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Store & Bot Settings Form */}
-                            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm mb-8">
-                                <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center space-x-2">
-                                    <span>⚙️</span>
-                                    <span>店铺及 Telegram 通知设置</span>
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-600 mb-1">店铺名称</label>
-                                        <input 
-                                            type="text" 
-                                            value={settings.shopName} 
-                                            onChange={(e) => setSettings({ ...settings, shopName: e.target.value })}
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-600 mb-1">收款二维码图片 URL</label>
-                                        <input 
-                                            type="text" 
-                                            value={settings.qrCodeUrl} 
-                                            onChange={(e) => setSettings({ ...settings, qrCodeUrl: e.target.value })}
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-600 mb-1">Telegram Bot Token (用于接收下单通知)</label>
-                                        <input 
-                                            type="password" 
-                                            placeholder="例如: 123456789:ABCdefGhIJKlmNoPQ..." 
-                                            value={settings.botToken} 
-                                            onChange={(e) => setSettings({ ...settings, botToken: e.target.value })}
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-600 mb-1">Telegram Chat ID (您的个人或群组 Chat ID)</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="例如: 987654321" 
-                                            value={settings.chatId} 
-                                            onChange={(e) => setSettings({ ...settings, chatId: e.target.value })}
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Orders List */}
-                            <div className="space-y-4">
-                                <h3 className="font-bold text-slate-900 text-sm">订单列表 ({orders.length})</h3>
-                                {orders.length === 0 ? (
-                                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
-                                        <p className="text-slate-400 text-xs">暂无任何订单记录</p>
-                                    </div>
-                                ) : (
-                                    orders.map(order => (
-                                        <div key={order.id} className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between gap-6">
-                                            <div className="flex-1 space-y-3">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
-                                                        #{order.id}
-                                                    </span>
-                                                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
-                                                        👤 {order.telegramHandle}
-                                                    </span>
-                                                    <span className="text-xs text-slate-400">
-                                                        ⏰ {order.createdAt}
-                                                    </span>
-                                                    {order.status === 'PENDING_VERIFICATION' && (
-                                                        <span className="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
-                                                            ⏳ 待店主审核 Bill Slip
-                                                        </span>
-                                                    )}
-                                                    {order.status === 'CONFIRMED' && (
-                                                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
-                                                            ✅ 已确认 / 制作中
-                                                        </span>
-                                                    )}
-                                                    {order.status === 'REJECTED' && (
-                                                        <span className="bg-rose-100 text-rose-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
-                                                            ❌ 已驳回
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {/* Items detail */}
-                                                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 space-y-1.5">
-                                                    {order.items.map((it, idx) => (
-                                                        <div key={idx} className="flex justify-between text-xs text-slate-700">
-                                                            <span>
-                                                                <strong>{it.name}</strong> x{it.quantity} 
-                                                                <span className="text-slate-400 ml-1">({it.size}, {it.sweetness}, {it.ice}{it.toppings.length ? ', ' + it.toppings.join('+') : ''})</span>
-                                                            </span>
-                                                            <span className="font-semibold">¥{it.price * it.quantity}</span>
-                                                        </div>
-                                                    ))}
-                                                    <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-slate-900 text-xs">
-                                                        <span>支付方式: {order.paymentMethod === 'qr' ? '扫码支付' : '现金支付'}</span>
-                                                        <span className="text-amber-600 text-sm">总计: ¥{order.totalAmount}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Bill Slip Verification Column */}
-                                            {order.paymentMethod === 'qr' ? (
-                                                <div className="w-full lg:w-64 flex flex-col items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                                                    <span className="text-[11px] font-bold text-slate-500 mb-2">客人上传的结账单凭证 (Bill Slip)</span>
-                                                    {order.billSlip ? (
-                                                        <a href={order.billSlip} target="_blank" rel="noreferrer" className="block w-full text-center">
-                                                            <img 
-                                                                src={order.billSlip} 
-                                                                alt="Bill Slip" 
-                                                                className="h-32 w-full object-contain rounded-xl border border-slate-300 bg-white mb-2 shadow-xs hover:opacity-90"
-                                                            />
-                                                            <span className="text-[10px] text-indigo-600 font-semibold underline">点击查看原图</span>
-                                                        </a>
-                                                    ) : (
-                                                        <div className="text-xs text-rose-500 font-medium py-8">未找到凭证图片</div>
-                                                    )}
-
-                                                    {order.status === 'PENDING_VERIFICATION' && (
-                                                        <div className="flex space-x-2 w-full mt-3">
-                                                            <button 
-                                                                onClick={() => handleApproveOrder(order.id)}
-                                                                className="flex-1 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition"
-                                                            >
-                                                                审核通过
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleRejectOrder(order.id)}
-                                                                className="flex-1 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition"
-                                                            >
-                                                                驳回
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="w-full lg:w-48 flex flex-col justify-center items-center bg-amber-50/50 p-3 rounded-2xl border border-amber-100">
-                                                    <span className="text-xs font-bold text-amber-900">💵 现金付款</span>
-                                                    <span className="text-[11px] text-amber-700 text-center mt-1">现场取餐时直接向客人收取现金。</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </main>
-                    )}
-
-                    {/* DRINK CUSTOMIZATION MODAL */}
-                    {selectedItem && (
-                        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-                            <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-in fade-in duration-200">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-slate-900">{selectedItem.name}</h3>
-                                        <p className="text-xs text-slate-400">{selectedItem.enName}</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => setSelectedItem(null)}
-                                        className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-
-                                {/* Size Selection */}
-                                <div className="mb-5">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2">规格选择</label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {['大杯', '超大杯 (+¥4)'].map((sz) => {
-                                            const isSelected = customOptions.size === (sz.startsWith('大杯') ? '大杯' : '超大杯');
-                                            return (
-                                                <button
-                                                    key={sz}
-                                                    onClick={() => setCustomOptions({ ...customOptions, size: sz.startsWith('大杯') ? '大杯' : '超大杯' })}
-                                                    className={`py-2 px-3 rounded-2xl text-xs font-semibold border transition ${
-                                                        isSelected 
-                                                        ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                    }`}
-                                                >
-                                                    {sz}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Sweetness Selection */}
-                                <div className="mb-5">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2">甜度选择</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {SWEETNESS_OPTIONS.map((sw) => (
-                                            <button
-                                                key={sw}
-                                                onClick={() => setCustomOptions({ ...customOptions, sweetness: sw })}
-                                                className={`py-1.5 px-3 rounded-xl text-xs font-semibold border transition ${
-                                                    customOptions.sweetness === sw
-                                                    ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                }`}
-                                            >
-                                                {sw}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Ice Level Selection */}
-                                <div className="mb-5">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2">冰量选择</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {ICE_OPTIONS.map((ic) => (
-                                            <button
-                                                key={ic}
-                                                onClick={() => setCustomOptions({ ...customOptions, ice: ic })}
-                                                className={`py-1.5 px-3 rounded-xl text-xs font-semibold border transition ${
-                                                    customOptions.ice === ic
-                                                    ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                }`}
-                                            >
-                                                {ic}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Toppings */}
-                                <div className="mb-6">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2">加料 (可多选)</label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {TOPPING_OPTIONS.map((top) => {
-                                            const isChecked = customOptions.selectedToppings.some(t => t.name === top.name);
-                                            return (
-                                                <button
-                                                    key={top.name}
-                                                    onClick={() => toggleTopping(top)}
-                                                    className={`py-2 px-3 rounded-2xl text-xs font-semibold border flex justify-between items-center transition ${
-                                                        isChecked
-                                                        ? 'bg-amber-50 border-amber-500 text-amber-900'
-                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                    }`}
-                                                >
-                                                    <span>{top.name}</span>
-                                                    <span className="text-amber-600 font-bold">+¥{top.price}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Confirm Add */}
-                                <button
-                                    onClick={handleAddToCart}
-                                    className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/30 transition flex justify-between items-center px-6"
-                                >
-                                    <span>加入购物车</span>
-                                    <span>
-                                        ¥{selectedItem.price + (customOptions.size === '超大杯' ? 4 : 0) + customOptions.selectedToppings.reduce((s, t) => s + t.price, 0)}
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* CART & CHECKOUT SLIDE-OVER MODAL */}
-                    {isCartOpen && (
-                        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end">
-                            <div className="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl animate-in slide-in-from-right duration-300">
-                                <div>
-                                    <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
-                                        <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-                                            <span>🧋 您的点餐清单</span>
-                                        </h3>
-                                        <button 
-                                            onClick={() => setIsCartOpen(false)}
-                                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-
-                                    {/* Item List */}
-                                    {cart.length === 0 ? (
-                                        <div className="py-20 text-center">
-                                            <div className="text-5xl mb-3">🧋</div>
-                                            <p className="text-slate-400 text-xs">购物车是空的，快去挑选好喝的吧~</p>
-                                        </div>
-                                    ) : (
-                                        <div className="max-h-[35vh] overflow-y-auto space-y-3 pr-1">
-                                            {cart.map(item => (
-                                                <div key={item.cartId} className="bg-slate-50 rounded-2xl p-3 border border-slate-100 flex justify-between items-center">
-                                                    <div className="flex-1 pr-2">
-                                                        <h4 className="font-bold text-slate-900 text-xs">{item.name}</h4>
-                                                        <p className="text-[11px] text-slate-500">
-                                                            {item.size} / {item.sweetness} / {item.ice}
-                                                            {item.toppings.length > 0 && ` / 加料: ${item.toppings.join(', ')}`}
-                                                        </p>
-                                                        <span className="text-amber-600 font-extrabold text-xs">¥{item.price * item.quantity}</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2 bg-white px-2 py-1 rounded-xl border border-slate-200">
-                                                        <button 
-                                                            onClick={() => updateCartQuantity(item.cartId, -1)}
-                                                            className="text-slate-500 font-bold px-1 hover:text-slate-900"
-                                                        >
-                                                            -
-                                                        </button>
-                                                        <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                                        <button 
-                                                            onClick={() => updateCartQuantity(item.cartId, 1)}
-                                                            className="text-slate-500 font-bold px-1 hover:text-slate-900"
-                                                        >
-                                                            +
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {cart.length > 0 && (
-                                        <div className="mt-6 pt-4 border-t border-slate-100 space-y-4">
-                                            {/* Telegram Username Requirement */}
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-800 mb-1">
-                                                    Telegram Username <span className="text-rose-500">*</span>
-                                                </label>
-                                                <div className="relative">
-                                                    <span className="absolute left-3 top-2.5 text-slate-400 text-xs font-mono">@</span>
-                                                    <input 
-                                                        type="text" 
-                                                        placeholder="username (例如: mytea_user)" 
-                                                        value={telegramHandle.replace(/^@/, '')}
-                                                        onChange={(e) => setTelegramHandle(e.target.value)}
-                                                        className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500"
-                                                    />
-                                                </div>
-                                                <p className="text-[10px] text-slate-400 mt-1">店主出餐或审核凭证时将通过 Telegram 与您联系。</p>
-                                            </div>
-
-                                            {/* Payment Option Selection */}
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-800 mb-2">
-                                                    付款方式 Payment Method
-                                                </label>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <button
-                                                        onClick={() => setPaymentMethod('qr')}
-                                                        className={`py-2.5 px-3 rounded-2xl text-xs font-bold border flex items-center justify-center space-x-1.5 transition ${
-                                                            paymentMethod === 'qr'
-                                                            ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                                                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                        }`}
-                                                    >
-                                                        <span>📱 扫码付款</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setPaymentMethod('cash')}
-                                                        className={`py-2.5 px-3 rounded-2xl text-xs font-bold border flex items-center justify-center space-x-1.5 transition ${
-                                                            paymentMethod === 'cash'
-                                                            ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                                                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                                        }`}
-                                                    >
-                                                        <span>💵 现金付款</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Scan QR Code & Bill Slip Upload Section */}
-                                            {paymentMethod === 'qr' && (
-                                                <div className="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/80 space-y-3">
-                                                    <div className="text-center">
-                                                        <span className="text-[11px] font-bold text-amber-900 block mb-1">请长按或扫描下方二维码完成转账</span>
-                                                        <div className="bg-white p-2 inline-block rounded-2xl border border-amber-200 shadow-sm">
-                                                            <img 
-                                                                src={settings.qrCodeUrl} 
-                                                                alt="Payment QR Code" 
-                                                                className="w-32 h-32 object-contain"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-slate-800 mb-1">
-                                                            上传 Bill Slip 结账单凭证 <span className="text-rose-500">*</span>
-                                                        </label>
-                                                        <input 
-                                                            type="file" 
-                                                            accept="image/*"
-                                                            onChange={handleBillSlipUpload}
-                                                            className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
-                                                        />
-                                                        {billSlip && (
-                                                            <div className="mt-2 text-center">
-                                                                <img src={billSlip} alt="Preview" className="h-20 mx-auto rounded-lg border border-slate-300 shadow-xs" />
-                                                                <span className="text-[10px] text-emerald-600 font-bold mt-1 block">✓ 凭证已就绪，下单后需店主审核</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Cart Bottom Action */}
-                                {cart.length > 0 && (
-                                    <div className="pt-4 border-t border-slate-100">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <span className="text-xs text-slate-500">应付金额:</span>
-                                            <span className="text-xl font-extrabold text-amber-600">¥{cartTotal}</span>
-                                        </div>
-                                        <button
-                                            onClick={handleSubmitOrder}
-                                            disabled={isSubmitting}
-                                            className="w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-xl transition disabled:opacity-50"
-                                        >
-                                            {isSubmitting ? '正在提交订单...' : '确认下单并通知店主'}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ORDER SUCCESS / PENDING STATUS MODAL */}
-                    {activeOrderConfirmation && (
-                        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                            <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl space-y-4">
-                                <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto">
-                                    {activeOrderConfirmation.paymentMethod === 'qr' ? '⏳' : '✅'}
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-900">
-                                        {activeOrderConfirmation.paymentMethod === 'qr' ? '已收到您的点餐申请！' : '下单成功，备餐中！'}
-                                    </h3>
-                                    <p className="text-xs text-slate-500 mt-1">
-                                        订单号: <strong className="font-mono">{activeOrderConfirmation.id}</strong>
-                                    </p>
-                                </div>
-
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs text-slate-600 text-left space-y-1">
-                                    <p>👤 客户 Telegram: <strong>{activeOrderConfirmation.telegramHandle}</strong></p>
-                                    <p>💰 支付金额: <strong>¥{activeOrderConfirmation.totalAmount}</strong></p>
-                                    <p>💳 支付形式: <strong>{activeOrderConfirmation.paymentMethod === 'qr' ? '扫码支付 (上传凭证)' : '现金支付'}</strong></p>
-                                    {activeOrderConfirmation.paymentMethod === 'qr' && (
-                                        <p className="text-amber-700 font-medium pt-1">
-                                            📌 提示: 店主正在核对您的 Bill Slip 结账单凭证，审核通过后将即刻为您制作！
-                                        </p>
-                                    )}
-                                </div>
-
-                                <button 
-                                    onClick={() => setActiveOrderConfirmation(null)}
-                                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold shadow-md transition"
-                                >
-                                    好的，我知道了
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* GEMINI AI RECOMMENDATION MODAL */}
-                    {isAiModalOpen && (
-                        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                            <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl">✨</span>
-                                        <div>
-                                            <h3 className="text-base font-bold text-slate-900">AI 奶茶调饮大师</h3>
-                                            <p className="text-xs text-slate-400">告诉我您此刻的心清或口感偏好</p>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={() => setIsAiModalOpen(false)}
-                                        className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-
-                                <div className="space-y-3 mb-4">
-                                    <textarea
-                                        rows={3}
-                                        placeholder="例如：今天加班有点累，想喝点清爽解腻又不想要太甜的... 或者：今天天气好热，推荐一杯冰爽果茶！"
-                                        value={aiPrompt}
-                                        onChange={(e) => setAiPrompt(e.target.value)}
-                                        className="w-full p-3 text-xs rounded-2xl border border-slate-200 focus:outline-none focus:border-amber-500 bg-slate-50"
-                                    ></textarea>
-
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {['🌞 炎热午后清爽点', '😴 困倦求续命提神', '🍫 想要治愈系甜品', '🥗 控糖无负担'].map(quick => (
-                                            <button
-                                                key={quick}
-                                                onClick={() => setAiPrompt(quick.substring(2))}
-                                                className="px-2.5 py-1 rounded-xl bg-purple-50 text-purple-700 text-[11px] font-semibold hover:bg-purple-100"
-                                            >
-                                                {quick}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    <button
-                                        onClick={handleAskAi}
-                                        disabled={aiLoading}
-                                        className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold text-xs shadow-md transition disabled:opacity-50 flex items-center justify-center space-x-2"
-                                    >
-                                        {aiLoading ? (
-                                            <span>✨ AI 正在为您特调设计配方...</span>
-                                        ) : (
-                                            <span>获取专属智能推荐</span>
-                                        )}
-                                    </button>
-                                </div>
-
-                                {/* AI Recommendation Result Display */}
-                                {aiResult && (
-                                    <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
-                                        <p className="text-xs italic text-slate-600 bg-purple-50/60 p-2.5 rounded-xl border border-purple-100">
-                                            💬 "{aiResult.friendlyMessage}"
-                                        </p>
-
-                                        {aiResult.recommendations?.map((rec, i) => (
-                                            <div key={i} className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-2">
-                                                <div className="flex justify-between items-start">
-                                                    <h4 className="font-bold text-slate-900 text-xs">🧋 {rec.name}</h4>
-                                                    <button
-                                                        onClick={() => addAiRecommendationToCart(rec)}
-                                                        className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold shadow-xs"
-                                                    >
-                                                        ＋ 按此配方加入购物车
-                                                    </button>
-                                                </div>
-                                                <p className="text-[11px] text-slate-500 leading-tight">{rec.reason}</p>
-                                                <div className="flex flex-wrap gap-1 text-[10px] text-amber-800">
-                                                    <span className="bg-amber-100 px-2 py-0.5 rounded-md font-medium">
-                                                        {rec.suggestedOptions?.sweetness}
-                                                    </span>
-                                                    <span className="bg-amber-100 px-2 py-0.5 rounded-md font-medium">
-                                                        {rec.suggestedOptions?.ice}
-                                                    </span>
-                                                    {rec.suggestedOptions?.toppings?.map((t, idx) => (
-                                                        <span key={idx} className="bg-amber-100 px-2 py-0.5 rounded-md font-medium">
-                                                            +{t}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+<body>
+
+    <!-- ========== TOAST 容器 ========== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ========== 主容器 ========== -->
+    <div class="container" id="app">
+
+        <!-- ===== 顶部栏 ===== -->
+        <div class="top-bar" id="topBar">
+            <div class="brand">
+                <i class="fas fa-leaf"></i>
+                <span>茶韵</span>
+            </div>
+            <div class="actions">
+                <button class="cart-btn" id="cartBtn" title="购物车">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="count" id="cartCount">0</span>
+                </button>
+                <button id="adminEntrance" title="管理后台">
+                    <i class="fas fa-user-shield"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== 页面：点单 ===== -->
+        <div class="page active" id="pageMenu">
+            <!-- 分类 -->
+            <div class="category-tabs" id="categoryTabs"></div>
+            <!-- 商品列表 -->
+            <div class="menu-grid" id="menuGrid"></div>
+            <!-- 空状态 -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <i class="fas fa-mug-saucer"></i>
+                <div class="text">暂无商品</div>
+            </div>
+        </div>
+
+        <!-- ===== 页面：结账 ===== -->
+        <div class="page" id="pageCheckout">
+            <div class="checkout-section">
+                <div class="section-title">
+                    <i class="fas fa-pen"></i> 填写订单信息
                 </div>
-            );
+
+                <!-- 客户姓名 -->
+                <div class="input-group">
+                    <label><i class="fas fa-user"></i> 您的 Telegram ID / 昵称</label>
+                    <input type="text" id="customerName" placeholder="例如 @xyu858699" value="" />
+                </div>
+
+                <!-- 用餐方式 -->
+                <label style="display:block;font-size:13px;font-weight:500;color:#a0a0b8;margin-bottom:6px;">
+                    <i class="fas fa-utensils"></i> 用餐方式
+                </label>
+                <div class="dining-options" id="diningOptions">
+                    <div class="option active" data-value="店内">
+                        <i class="fas fa-store"></i> 店内 · 桌号
+                    </div>
+                    <div class="option" data-value="打包">
+                        <i class="fas fa-box"></i> 打包 · 配送
+                    </div>
+                </div>
+                <div class="input-group" id="diningDetailGroup">
+                    <label id="diningDetailLabel">桌号</label>
+                    <input type="text" id="diningDetail" placeholder="例如 A01" value="" />
+                </div>
+
+                <!-- 付款方式 -->
+                <label style="display:block;font-size:13px;font-weight:500;color:#a0a0b8;margin-bottom:6px;margin-top:4px;">
+                    <i class="fas fa-credit-card"></i> 付款方式
+                </label>
+                <div class="payment-options" id="paymentOptions">
+                    <div class="option active" data-value="现金">
+                        <i class="fas fa-money-bill-wave"></i> 现金付款
+                    </div>
+                    <div class="option" data-value="扫码">
+                        <i class="fas fa-qrcode"></i> 扫码付款
+                    </div>
+                </div>
+
+                <!-- 扫码上传 -->
+                <div id="uploadAreaWrapper" style="display:none;">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <div class="hint">点击上传付款截图</div>
+                        <input type="file" accept="image/*" id="fileInput" style="display:none;" />
+                        <button class="remove-img" id="removeImgBtn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <!-- 订单摘要 -->
+                <div class="order-summary" id="orderSummary">
+                    <div id="summaryItems"></div>
+                    <div class="total-row">
+                        <span>总计</span>
+                        <span class="price">¥<span id="summaryTotal">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button class="btn btn-primary" id="submitOrderBtn">
+                    <i class="fas fa-check-circle"></i> 提交订单
+                </button>
+                <button class="btn btn-secondary mt-8" id="backToMenuBtn">
+                    <i class="fas fa-arrow-left"></i> 返回菜单
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== 页面：订单完成 ===== -->
+        <div class="page" id="pageSuccess">
+            <div class="text-center" style="padding:40px 0;">
+                <div style="font-size:72px;color:#4cdb7c;margin-bottom:16px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 style="font-size:26px;font-weight:700;margin-bottom:8px;">订单已提交</h2>
+                <p style="color:#8888a0;font-size:15px;" id="successMessage">等待店主确认</p>
+                <div style="margin-top:24px;background:rgba(255,255,255,0.04);border-radius:16px;padding:16px;text-align:left;">
+                    <p style="font-size:13px;color:#8888a0;">订单号：<span id="successOrderId" style="color:#d4af37;font-weight:600;"></span></p>
+                    <p style="font-size:13px;color:#8888a0;margin-top:4px;">状态：<span id="successStatus" style="color:#d4af37;font-weight:600;">待确认</span></p>
+                </div>
+                <button class="btn btn-primary mt-24" id="continueShoppingBtn">
+                    <i class="fas fa-arrow-left"></i> 继续点单
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== 页面：后台登录 ===== -->
+        <div class="page" id="pageAdminLogin">
+            <div class="admin-login">
+                <div class="lock-icon"><i class="fas fa-lock"></i></div>
+                <div class="title">店主管理</div>
+                <div class="sub">输入密码进入后台</div>
+                <div style="width:100%;max-width:320px;">
+                    <div class="input-group">
+                        <input type="password" id="adminPasswordInput" placeholder="请输入密码" />
+                    </div>
+                    <button class="btn btn-primary" id="adminLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </button>
+                    <button class="btn btn-secondary mt-8" id="adminLoginBackBtn">
+                        <i class="fas fa-arrow-left"></i> 返回点单
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 页面：后台管理 ===== -->
+        <div class="page" id="pageAdminPanel">
+            <div class="admin-panel">
+                <!-- 头部 -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h2 style="font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-chart-simple" style="color:#d4af37;"></i> 订单管理
+                    </h2>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-secondary btn-sm" id="adminSettingsBtn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" id="adminLogoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 统计 -->
+                <div class="stats" id="adminStats">
+                    <div class="stat-item">
+                        <div class="num" id="statTotal">0</div>
+                        <div class="label">总订单</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num" id="statPending">0</div>
+                        <div class="label">待确认</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num" id="statConfirmed">0</div>
+                        <div class="label">已确认</div>
+                    </div>
+                </div>
+
+                <!-- 设置面板 (默认隐藏) -->
+                <div id="adminSettingsPanel" style="display:none;margin-bottom:16px;">
+                    <div class="glass-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <span style="font-weight:600;font-size:16px;"><i class="fas fa-sliders-h" style="color:#d4af37;"></i> 设置</span>
+                            <button class="btn btn-secondary btn-sm" id="closeSettingsBtn">关闭</button>
+                        </div>
+                        <div class="settings-group">
+                            <div class="setting-item">
+                                <div class="info">
+                                    <div class="label">店主 Telegram ID</div>
+                                    <div class="desc">用于接收订单通知（不显示在菜单上）</div>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <input type="text" id="adminTelegramIdInput" style="width:140px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#f0ece4;font-size:13px;" />
+                                    <button class="btn btn-primary btn-sm" id="saveTelegramIdBtn" style="width:auto;padding:8px 16px;">保存</button>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="info">
+                                    <div class="label">修改管理密码</div>
+                                    <div class="desc">至少6位</div>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <input type="password" id="adminNewPasswordInput" style="width:140px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#f0ece4;font-size:13px;" placeholder="新密码" />
+                                    <button class="btn btn-primary btn-sm" id="savePasswordBtn" style="width:auto;padding:8px 16px;">修改</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 订单列表 -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+                    <span style="font-weight:600;font-size:16px;">📋 全部订单</span>
+                    <span style="font-size:13px;color:#8888a0;" id="orderCountLabel">0 笔</span>
+                </div>
+                <div class="order-list" id="adminOrderList">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <div class="text">暂无订单</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== 订单详情弹窗 ========== -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <span>📄 订单详情</span>
+                <button class="close" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalBody">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 购物车浮窗 ========== -->
+    <div class="cart-floating hidden" id="cartFloating">
+        <div class="info">
+            <span class="count" id="cartFloatingCount">0</span>
+            <span class="total"><span class="currency">¥</span><span id="cartFloatingTotal">0.00</span></span>
+        </div>
+        <button class="checkout-btn" id="cartCheckoutBtn">
+            去结账 <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <script>
+        // ================================================================
+        //  DATA
+        // ================================================================
+        const DEFAULT_MENU = [{
+            id: 1,
+            category: '经典奶茶',
+            name: '珍珠奶茶',
+            desc: 'Q弹珍珠 · 经典风味',
+            price: 15,
+            icon: '🧋'
+        }, {
+            id: 2,
+            category: '经典奶茶',
+            name: '椰香奶茶',
+            desc: '浓郁椰香 · 丝滑口感',
+            price: 17,
+            icon: '🥥'
+        }, {
+            id: 3,
+            category: '经典奶茶',
+            name: '焦糖奶茶',
+            desc: '焦糖香甜 · 暖心之选',
+            price: 16,
+            icon: '🍬'
+        }, {
+            id: 4,
+            category: '鲜果茶',
+            name: '满杯红柚',
+            desc: '鲜红柚汁 · 清爽解腻',
+            price: 20,
+            icon: '🍊'
+        }, {
+            id: 5,
+            category: '鲜果茶',
+            name: '金桔柠檬',
+            desc: '金桔+柠檬 · 酸甜醒神',
+            price: 18,
+            icon: '🍋'
+        }, {
+            id: 6,
+            category: '鲜果茶',
+            name: '百香果茶',
+            desc: '百香果粒 · 热带风情',
+            price: 19,
+            icon: '🍈'
+        }, {
+            id: 7,
+            category: '芝士茶',
+            name: '芝士奶盖绿',
+            desc: '海盐奶盖 · 茉莉茶底',
+            price: 22,
+            icon: '🧀'
+        }, {
+            id: 8,
+            category: '芝士茶',
+            name: '芝士草莓',
+            desc: '鲜草莓+芝士奶盖',
+            price: 24,
+            icon: '🍓'
+        }, {
+            id: 9,
+            category: '芝士茶',
+            name: '芝士黑提',
+            desc: '黑提果肉 · 芝香浓郁',
+            price: 23,
+            icon: '🍇'
+        }];
+
+        // ================================================================
+        //  STATE
+        // ================================================================
+        let state = {
+            menu: [],
+            categories: [],
+            cart: [], // { id, name, price, quantity }
+            orders: [], // 完整订单
+            settings: {
+                telegramId: '@店主_茶韵',
+                adminPassword: '123456'
+            },
+            currentCategory: '',
+            customerName: '',
+            diningType: '店内',
+            diningDetail: '',
+            paymentMethod: '现金',
+            paymentImage: null, // base64
+            isAdminLoggedIn: false,
+            selectedOrderId: null,
+        };
+
+        // ================================================================
+        //  DOM REFS
+        // ================================================================
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        const dom = {
+            pageMenu: $('#pageMenu'),
+            pageCheckout: $('#pageCheckout'),
+            pageSuccess: $('#pageSuccess'),
+            pageAdminLogin: $('#pageAdminLogin'),
+            pageAdminPanel: $('#pageAdminPanel'),
+
+            categoryTabs: $('#categoryTabs'),
+            menuGrid: $('#menuGrid'),
+            emptyState: $('#emptyState'),
+
+            cartFloating: $('#cartFloating'),
+            cartFloatingCount: $('#cartFloatingCount'),
+            cartFloatingTotal: $('#cartFloatingTotal'),
+            cartCount: $('#cartCount'),
+            cartBtn: $('#cartBtn'),
+            cartCheckoutBtn: $('#cartCheckoutBtn'),
+
+            customerName: $('#customerName'),
+            diningOptions: $$('#diningOptions .option'),
+            diningDetail: $('#diningDetail'),
+            diningDetailLabel: $('#diningDetailLabel'),
+            diningDetailGroup: $('#diningDetailGroup'),
+            paymentOptions: $$('#paymentOptions .option'),
+            uploadAreaWrapper: $('#uploadAreaWrapper'),
+            uploadArea: $('#uploadArea'),
+            fileInput: $('#fileInput'),
+            removeImgBtn: $('#removeImgBtn'),
+
+            summaryItems: $('#summaryItems'),
+            summaryTotal: $('#summaryTotal'),
+            submitOrderBtn: $('#submitOrderBtn'),
+            backToMenuBtn: $('#backToMenuBtn'),
+
+            successOrderId: $('#successOrderId'),
+            successStatus: $('#successStatus'),
+            successMessage: $('#successMessage'),
+            continueShoppingBtn: $('#continueShoppingBtn'),
+
+            adminEntrance: $('#adminEntrance'),
+            adminPasswordInput: $('#adminPasswordInput'),
+            adminLoginBtn: $('#adminLoginBtn'),
+            adminLoginBackBtn: $('#adminLoginBackBtn'),
+            adminLogoutBtn: $('#adminLogoutBtn'),
+            adminSettingsBtn: $('#adminSettingsBtn'),
+            adminSettingsPanel: $('#adminSettingsPanel'),
+            closeSettingsBtn: $('#closeSettingsBtn'),
+            adminTelegramIdInput: $('#adminTelegramIdInput'),
+            saveTelegramIdBtn: $('#saveTelegramIdBtn'),
+            adminNewPasswordInput: $('#adminNewPasswordInput'),
+            savePasswordBtn: $('#savePasswordBtn'),
+            adminOrderList: $('#adminOrderList'),
+            statTotal: $('#statTotal'),
+            statPending: $('#statPending'),
+            statConfirmed: $('#statConfirmed'),
+            orderCountLabel: $('#orderCountLabel'),
+
+            modal: $('#orderModal'),
+            modalBody: $('#modalBody'),
+            modalCloseBtn: $('#modalCloseBtn'),
+
+            toastContainer: $('#toastContainer'),
+        };
+
+        // ================================================================
+        //  HELPERS
+        // ================================================================
+        function genId() {
+            const d = new Date();
+            const ts = d.getFullYear() +
+                String(d.getMonth() + 1).padStart(2, '0') +
+                String(d.getDate()).padStart(2, '0') + '-' +
+                String(d.getHours()).padStart(2, '0') +
+                String(d.getMinutes()).padStart(2, '0') +
+                String(d.getSeconds()).padStart(2, '0');
+            const rand = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            return 'CH' + ts + rand;
         }
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        function formatPrice(v) { return v.toFixed(2); }
+
+        function getCartTotal() {
+            return state.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        }
+
+        function getCartCount() {
+            return state.cart.reduce((s, i) => s + i.quantity, 0);
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('teaShop_state', JSON.stringify({
+                    menu: state.menu,
+                    orders: state.orders,
+                    settings: state.settings,
+                }));
+            } catch (e) {}
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('teaShop_state');
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    state.menu = data.menu || [];
+                    state.orders = data.orders || [];
+                    state.settings = data.settings || state.settings;
+                }
+            } catch (e) {}
+            if (!state.menu.length) {
+                state.menu = JSON.parse(JSON.stringify(DEFAULT_MENU));
+            }
+            // 提取分类
+            const cats = new Set();
+            state.menu.forEach(item => cats.add(item.category));
+            state.categories = Array.from(cats);
+            if (state.categories.length) state.currentCategory = state.categories[0];
+        }
+
+        function showToast(text, type = 'info', duration = 3000) {
+            const icons = {
+                info: 'fa-info-circle',
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+            };
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${text}`;
+            dom.toastContainer.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-10px)';
+                setTimeout(() => el.remove(), 300);
+            }, duration);
+        }
+
+        // ================================================================
+        //  RENDER: MENU
+        // ================================================================
+        function renderCategories() {
+            const container = dom.categoryTabs;
+            container.innerHTML = '';
+            state.categories.forEach((cat, idx) => {
+                const tab = document.createElement('div');
+                tab.className = `tab${idx === 0 ? ' active' : ''}`;
+                tab.textContent = cat;
+                tab.dataset.cat = cat;
+                tab.addEventListener('click', () => {
+                    state.currentCategory = cat;
+                    renderCategories();
+                    renderMenu();
+                });
+                container.appendChild(tab);
+            });
+            // 激活高亮
+            const tabs = container.querySelectorAll('.tab');
+            tabs.forEach(t => {
+                t.classList.toggle('active', t.dataset.cat === state.currentCategory);
+            });
+        }
+
+        function renderMenu() {
+            const grid = dom.menuGrid;
+            const empty = dom.emptyState;
+            const items = state.menu.filter(i => i.category === state.currentCategory);
+            if (!items.length) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            grid.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'menu-item';
+                const inCart = state.cart.find(c => c.id === item.id);
+                const qty = inCart ? inCart.quantity : 0;
+                card.innerHTML = `
+              <span class="icon">${item.icon || '🧋'}</span>
+              <div class="name">${item.name}</div>
+              <div class="desc">${item.desc || ''}</div>
+              <div class="bottom">
+                <span class="price">¥${formatPrice(item.price)}</span>
+                <button class="add-btn" data-id="${item.id}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              ${qty > 0 ? `<div style="position:absolute;top:8px;right:12px;background:rgba(212,175,55,0.2);color:#d4af37;font-size:12px;font-weight:700;padding:2px 10px;border-radius:50px;">×${qty}</div>` : ''}
+            `;
+                card.querySelector('.add-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addToCart(item.id);
+                });
+                grid.appendChild(card);
+            });
+        }
+
+        // ================================================================
+        //  CART
+        // ================================================================
+        function addToCart(itemId) {
+            const item = state.menu.find(i => i.id === itemId);
+            if (!item) return;
+            const existing = state.cart.find(c => c.id === itemId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                state.cart.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
+            }
+            updateCartUI();
+            showToast(`已添加 ${item.name}`, 'success', 1500);
+        }
+
+        function removeFromCart(itemId) {
+            const idx = state.cart.findIndex(c => c.id === itemId);
+            if (idx === -1) return;
+            const item = state.cart[idx];
+            if (item.quantity > 1) {
+                item.quantity -= 1;
+            } else {
+                state.cart.splice(idx, 1);
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const count = getCartCount();
+            const total = getCartTotal();
+            dom.cartCount.textContent = count;
+            dom.cartFloatingCount.textContent = count;
+            dom.cartFloatingTotal.textContent = formatPrice(total);
+            dom.cartFloating.classList.toggle('hidden', count === 0);
+            // 更新菜单上的数量标签
+            renderMenu();
+            // 如果结账页打开，更新摘要
+            if (dom.pageCheckout.classList.contains('active')) {
+                renderSummary();
+            }
+        }
+
+        // ================================================================
+        //  RENDER: CHECKOUT SUMMARY
+        // ================================================================
+        function renderSummary() {
+            const container = dom.summaryItems;
+            container.innerHTML = '';
+            if (!state.cart.length) {
+                container.innerHTML = '<div style="color:#8888a0;text-align:center;padding:12px 0;">购物车为空</div>';
+                dom.summaryTotal.textContent = '0.00';
+                return;
+            }
+            state.cart.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+              <span>${item.name} × ${item.quantity}</span>
+              <span>¥${formatPrice(item.price * item.quantity)}</span>
+            `;
+                container.appendChild(row);
+            });
+            dom.summaryTotal.textContent = formatPrice(getCartTotal());
+        }
+
+        // ================================================================
+        //  NAVIGATION
+        // ================================================================
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+            // 更新购物车浮窗可见性
+            if (pageId === 'pageMenu') {
+                updateCartUI();
+            } else {
+                dom.cartFloating.classList.add('hidden');
+            }
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================================================================
+        //  CHECKOUT FLOW
+        // ================================================================
+        function openCheckout() {
+            if (!state.cart.length) {
+                showToast('请先添加商品', 'error');
+                return;
+            }
+            // 填充顾客名
+            dom.customerName.value = state.customerName || '';
+            // 用餐方式
+            const diningOpts = dom.diningOptions;
+            diningOpts.forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.value === state.diningType);
+            });
+            dom.diningDetail.value = state.diningDetail || '';
+            updateDiningLabel();
+
+            // 付款方式
+            const payOpts = dom.paymentOptions;
+            payOpts.forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.value === state.paymentMethod);
+            });
+            toggleUploadArea(state.paymentMethod === '扫码');
+
+            // 摘要
+            renderSummary();
+            showPage('pageCheckout');
+        }
+
+        function updateDiningLabel() {
+            const is店内 = state.diningType === '店内';
+            dom.diningDetailLabel.textContent = is店内 ? '桌号' : '配送地址';
+            dom.diningDetail.placeholder = is店内 ? '例如 A01' : '请输入详细地址';
+        }
+
+        function toggleUploadArea(show) {
+            dom.uploadAreaWrapper.style.display = show ? 'block' : 'none';
+        }
+
+        function submitOrder() {
+            // 验证
+            const name = dom.customerName.value.trim();
+            if (!name) {
+                showToast('请填写您的 Telegram ID / 昵称', 'error');
+                return;
+            }
+            state.customerName = name;
+
+            const diningType = state.diningType;
+            const diningDetail = dom.diningDetail.value.trim();
+            if (!diningDetail) {
+                showToast(diningType === '店内' ? '请填写桌号' : '请填写配送地址', 'error');
+                return;
+            }
+            state.diningDetail = diningDetail;
+
+            const paymentMethod = state.paymentMethod;
+            if (paymentMethod === '扫码') {
+                if (!state.paymentImage) {
+                    showToast('请上传付款截图', 'error');
+                    return;
+                }
+            }
+
+            if (!state.cart.length) {
+                showToast('购物车为空', 'error');
+                return;
+            }
+
+            // 构建订单
+            const order = {
+                id: genId(),
+                customerName: name,
+                items: JSON.parse(JSON.stringify(state.cart)),
+                total: getCartTotal(),
+                diningType: diningType,
+                diningDetail: diningDetail,
+                paymentMethod: paymentMethod,
+                paymentImage: state.paymentImage || null,
+                status: paymentMethod === '现金' ? '已确认' : '待确认', // 现金直接确认，扫码待确认
+                createdAt: new Date().toLocaleString('zh-CN', { hour12: false }),
+                rawTimestamp: Date.now(),
+            };
+
+            state.orders.unshift(order);
+            saveState();
+
+            // 清空购物车
+            state.cart = [];
+            updateCartUI();
+
+            // 清空付款图片
+            state.paymentImage = null;
+            dom.fileInput.value = '';
+            dom.uploadArea.classList.remove('has-img');
+            dom.uploadArea.querySelector('img')?.remove();
+
+            // 显示成功页
+            dom.successOrderId.textContent = order.id;
+            dom.successStatus.textContent = order.status;
+            dom.successMessage.textContent = paymentMethod === '现金' ?
+                '✅ 现金付款已确认，请等待制作完成。' :
+                '⏳ 扫码付款等待店主确认，请留意通知。';
+
+            showPage('pageSuccess');
+
+            // 模拟 Telegram 通知（在后台订单列表可见）
+            const tgId = state.settings.telegramId || '店主';
+            console.log(`[Telegram 通知] 发送至 ${tgId}: 新订单 ${order.id}，客户 ${order.customerName}，总计 ¥${formatPrice(order.total)}`);
+            showToast(`📨 已通知店主 (${tgId})`, 'success', 2000);
+        }
+
+        // ================================================================
+        //  ADMIN
+        // ================================================================
+        function adminLogin() {
+            const pwd = dom.adminPasswordInput.value.trim();
+            if (pwd === state.settings.adminPassword) {
+                state.isAdminLoggedIn = true;
+                dom.adminPasswordInput.value = '';
+                renderAdminPanel();
+                showPage('pageAdminPanel');
+                showToast('登录成功', 'success');
+            } else {
+                showToast('密码错误', 'error');
+            }
+        }
+
+        function renderAdminPanel() {
+            const orders = state.orders;
+            const total = orders.length;
+            const pending = orders.filter(o => o.status === '待确认').length;
+            const confirmed = orders.filter(o => o.status === '已确认').length;
+
+            dom.statTotal.textContent = total;
+            dom.statPending.textContent = pending;
+            dom.statConfirmed.textContent = confirmed;
+            dom.orderCountLabel.textContent = `${total} 笔`;
+
+            const list = dom.adminOrderList;
+            if (!orders.length) {
+                list.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <div class="text">暂无订单</div>
+              </div>
+            `;
+                return;
+            }
+
+            list.innerHTML = '';
+            orders.forEach((order, idx) => {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                const statusMap = {
+                    '待确认': '<span class="badge badge-orange">待确认</span>',
+                    '已确认': '<span class="badge badge-green">已确认</span>',
+                };
+                const itemsStr = order.items.map(i => `${i.name}×${i.quantity}`).join('、');
+                const payIcon = order.paymentMethod === '现金' ? '💵' : '📱';
+                card.innerHTML = `
+              <div class="top-row">
+                <div class="customer">
+                  ${order.customerName}
+                  <small>${payIcon} ${order.paymentMethod}</small>
+                </div>
+                <div class="status">${statusMap[order.status] || order.status}</div>
+              </div>
+              <div class="items-preview">${itemsStr}</div>
+              <div class="bottom-row">
+                <span>${order.diningType} · ${order.diningDetail}</span>
+                <span class="total">¥${formatPrice(order.total)}</span>
+              </div>
+              <div style="font-size:12px;color:#6a6a82;margin-top:4px;">${order.createdAt}</div>
+            `;
+                card.addEventListener('click', () => openOrderDetail(order.id));
+                list.appendChild(card);
+            });
+        }
+
+        function openOrderDetail(orderId) {
+            const order = state.orders.find(o => o.id === orderId);
+            if (!order) return;
+            state.selectedOrderId = orderId;
+
+            const body = dom.modalBody;
+            const statusMap = {
+                '待确认': '<span class="badge badge-orange">待确认</span>',
+                '已确认': '<span class="badge badge-green">已确认</span>',
+            };
+            const itemsHtml = order.items.map(i =>
+                `<div class="detail-row"><span class="label">${i.name} × ${i.quantity}</span><span class="value">¥${formatPrice(i.price * i.quantity)}</span></div>`
+            ).join('');
+
+            let paymentImageHtml = '';
+            if (order.paymentImage) {
+                paymentImageHtml = `
+              <div class="payment-image">
+                <img src="${order.paymentImage}" alt="付款截图" />
+              </div>
+            `;
+            }
+
+            const isPending = order.status === '待确认';
+
+            body.innerHTML = `
+            <div class="detail-row"><span class="label">订单号</span><span class="value" style="color:#d4af37;font-weight:600;">${order.id}</span></div>
+            <div class="detail-row"><span class="label">客户</span><span class="value">${order.customerName}</span></div>
+            <div class="detail-row"><span class="label">用餐方式</span><span class="value">${order.diningType} · ${order.diningDetail}</span></div>
+            <div class="detail-row"><span class="label">付款方式</span><span class="value">${order.paymentMethod}</span></div>
+            <div class="detail-row"><span class="label">状态</span><span class="value">${statusMap[order.status] || order.status}</span></div>
+            <div class="detail-row"><span class="label">时间</span><span class="value">${order.createdAt}</span></div>
+            <div style="margin:10px 0 4px;font-weight:600;color:#d4af37;">商品明细</div>
+            ${itemsHtml}
+            <div class="detail-row" style="border-top:2px solid rgba(212,175,55,0.15);margin-top:6px;padding-top:12px;font-weight:700;">
+              <span class="label">总计</span>
+              <span class="value" style="color:#d4af37;font-size:18px;">¥${formatPrice(order.total)}</span>
+            </div>
+            ${paymentImageHtml}
+            <div class="modal-actions">
+              ${isPending ? `<button class="btn btn-success btn-sm" id="modalConfirmBtn"><i class="fas fa-check"></i> 确认订单</button>` : ''}
+              ${isPending ? `<button class="btn btn-danger btn-sm" id="modalCancelBtn"><i class="fas fa-times"></i> 取消订单</button>` : ''}
+              <button class="btn btn-secondary btn-sm" id="modalCloseBtn2">关闭</button>
+            </div>
+          `;
+
+            dom.modal.classList.add('show');
+
+            // 事件绑定
+            const closeModal = () => dom.modal.classList.remove('show');
+            dom.modal.querySelector('#modalCloseBtn2')?.addEventListener('click', closeModal);
+
+            if (isPending) {
+                dom.modal.querySelector('#modalConfirmBtn')?.addEventListener('click', () => {
+                    confirmOrder(order.id);
+                    closeModal();
+                });
+                dom.modal.querySelector('#modalCancelBtn')?.addEventListener('click', () => {
+                    cancelOrder(order.id);
+                    closeModal();
+                });
+            }
+        }
+
+        function confirmOrder(orderId) {
+            const order = state.orders.find(o => o.id === orderId);
+            if (!order) return;
+            if (order.status === '已确认') {
+                showToast('订单已确认', 'info');
+                return;
+            }
+            order.status = '已确认';
+            saveState();
+            renderAdminPanel();
+            showToast(`✅ 订单 ${orderId} 已确认`, 'success');
+            // 模拟通知
+            const tgId = state.settings.telegramId || '店主';
+            console.log(`[Telegram 通知] 发送至 ${tgId}: 订单 ${orderId} 已确认`);
+        }
+
+        function cancelOrder(orderId) {
+            const idx = state.orders.findIndex(o => o.id === orderId);
+            if (idx === -1) return;
+            state.orders.splice(idx, 1);
+            saveState();
+            renderAdminPanel();
+            showToast(`已取消订单 ${orderId}`, 'error');
+        }
+
+        // ================================================================
+        //  SETTINGS
+        // ================================================================
+        function openSettings() {
+            dom.adminTelegramIdInput.value = state.settings.telegramId || '';
+            dom.adminNewPasswordInput.value = '';
+            dom.adminSettingsPanel.style.display = 'block';
+        }
+
+        function saveTelegramId() {
+            const val = dom.adminTelegramIdInput.value.trim();
+            if (!val) {
+                showToast('请输入有效的 Telegram ID', 'error');
+                return;
+            }
+            state.settings.telegramId = val;
+            saveState();
+            showToast('✅ Telegram ID 已更新', 'success');
+        }
+
+        function savePassword() {
+            const val = dom.adminNewPasswordInput.value.trim();
+            if (val.length < 6) {
+                showToast('密码至少6位', 'error');
+                return;
+            }
+            state.settings.adminPassword = val;
+            saveState();
+            dom.adminNewPasswordInput.value = '';
+            showToast('✅ 密码已更新', 'success');
+        }
+
+        // ================================================================
+        //  EVENTS
+        // ================================================================
+        function init() {
+            loadState();
+            renderCategories();
+            renderMenu();
+            updateCartUI();
+
+            // 购物车按钮
+            dom.cartBtn.addEventListener('click', openCheckout);
+            dom.cartCheckoutBtn.addEventListener('click', openCheckout);
+
+            // 返回菜单
+            dom.backToMenuBtn.addEventListener('click', () => {
+                showPage('pageMenu');
+                updateCartUI();
+            });
+
+            // 继续点单
+            dom.continueShoppingBtn.addEventListener('click', () => {
+                showPage('pageMenu');
+                updateCartUI();
+            });
+
+            // 用餐方式切换
+            dom.diningOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    dom.diningOptions.forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                    state.diningType = opt.dataset.value;
+                    updateDiningLabel();
+                });
+            });
+
+            // 付款方式切换
+            dom.paymentOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    dom.paymentOptions.forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                    state.paymentMethod = opt.dataset.value;
+                    toggleUploadArea(state.paymentMethod === '扫码');
+                    if (state.paymentMethod === '现金') {
+                        // 清除图片
+                        state.paymentImage = null;
+                        dom.fileInput.value = '';
+                        dom.uploadArea.classList.remove('has-img');
+                        dom.uploadArea.querySelector('img')?.remove();
+                    }
+                });
+            });
+
+            // 上传图片
+            dom.uploadArea.addEventListener('click', () => {
+                dom.fileInput.click();
+            });
+            dom.fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const base64 = ev.target.result;
+                    state.paymentImage = base64;
+                    dom.uploadArea.classList.add('has-img');
+                    // 移除旧的img
+                    dom.uploadArea.querySelector('img')?.remove();
+                    const img = document.createElement('img');
+                    img.src = base64;
+                    dom.uploadArea.appendChild(img);
+                    showToast('✅ 截图已上传', 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+            dom.removeImgBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                state.paymentImage = null;
+                dom.fileInput.value = '';
+                dom.uploadArea.classList.remove('has-img');
+                dom.uploadArea.querySelector('img')?.remove();
+            });
+
+            // 提交订单
+            dom.submitOrderBtn.addEventListener('click', submitOrder);
+
+            // 后台入口
+            dom.adminEntrance.addEventListener('click', () => {
+                if (state.isAdminLoggedIn) {
+                    renderAdminPanel();
+                    showPage('pageAdminPanel');
+                } else {
+                    dom.adminPasswordInput.value = '';
+                    showPage('pageAdminLogin');
+                }
+            });
+
+            // 后台登录
+            dom.adminLoginBtn.addEventListener('click', adminLogin);
+            dom.adminPasswordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') adminLogin();
+            });
+            dom.adminLoginBackBtn.addEventListener('click', () => {
+                showPage('pageMenu');
+                updateCartUI();
+            });
+
+            // 后台退出
+            dom.adminLogoutBtn.addEventListener('click', () => {
+                state.isAdminLoggedIn = false;
+                showPage('pageMenu');
+                updateCartUI();
+                showToast('已退出后台', 'info');
+            });
+
+            // 后台设置
+            dom.adminSettingsBtn.addEventListener('click', () => {
+                if (dom.adminSettingsPanel.style.display === 'block') {
+                    dom.adminSettingsPanel.style.display = 'none';
+                } else {
+                    openSettings();
+                }
+            });
+            dom.closeSettingsBtn.addEventListener('click', () => {
+                dom.adminSettingsPanel.style.display = 'none';
+            });
+            dom.saveTelegramIdBtn.addEventListener('click', saveTelegramId);
+            dom.savePasswordBtn.addEventListener('click', savePassword);
+
+            // 弹窗关闭
+            dom.modalCloseBtn.addEventListener('click', () => {
+                dom.modal.classList.remove('show');
+            });
+            dom.modal.addEventListener('click', (e) => {
+                if (e.target === dom.modal) dom.modal.classList.remove('show');
+            });
+
+            // 键盘快捷键 ESC 关闭弹窗
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') dom.modal.classList.remove('show');
+            });
+
+            // 自动清理过期的图片数据（不做）
+
+            // 如果订单列表有数据，后台统计
+            console.log('🍵 茶韵点单系统已启动');
+            console.log(`📦 ${state.orders.length} 笔历史订单`);
+            console.log(`👤 店主 ID: ${state.settings.telegramId}`);
+
+            // 如果是从后台退出的状态，确保页面正确
+            if (state.isAdminLoggedIn) {
+                // 但不自动跳转，保持菜单页
+            }
+        }
+
+        // 暴露一些功能到全局，便于调试
+        window.__teaShop = {
+            state,
+            addToCart,
+            removeFromCart,
+            submitOrder,
+            confirmOrder,
+            cancelOrder,
+            saveState,
+            renderAdminPanel,
+        };
+
+        // 启动
+        document.addEventListener('DOMContentLoaded', init);
     </script>
+
 </body>
 </html>
