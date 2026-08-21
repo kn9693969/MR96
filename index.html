@@ -1,1327 +1,964 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🍹 ChillSip - Cold Drink Order</title>
-
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- QRCode.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
-    </script>
-
-    <style>
-        /* ---------- RESET & BASE ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f8;
-            color: #1e293b;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* ---------- APP CONTAINER ---------- */
-        .app {
-            max-width: 1200px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* ---------- HEADER ---------- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #fff;
-            border-bottom: 3px solid #38bdf8;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-left h1 {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .header-left h1 span {
-            color: #38bdf8;
-        }
-
-        .header-left i {
-            font-size: 28px;
-            color: #38bdf8;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-right .telegram-link {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.10);
-            padding: 6px 14px 6px 10px;
-            border-radius: 30px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.25s;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .header-right .telegram-link:hover {
-            background: rgba(255, 255, 255, 0.20);
-        }
-
-        .header-right .telegram-link i {
-            color: #38bdf8;
-            font-size: 18px;
-        }
-
-        .cart-btn {
-            position: relative;
-            background: rgba(255, 255, 255, 0.10);
-            border: none;
-            color: #fff;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            font-size: 22px;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cart-btn:hover {
-            background: rgba(255, 255, 255, 0.20);
-        }
-
-        .cart-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #1e293b;
-        }
-
-        .header-status {
-            font-size: 14px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #22c55e;
-            display: inline-block;
-            animation: pulse-dot 1.8s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
-        }
-
-        /* ---------- MAIN LAYOUT ---------- */
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 24px 30px 30px;
-            gap: 30px;
-        }
-
-        .menu-section {
-            flex: 2;
-            min-width: 280px;
-        }
-
-        .cart-section {
-            flex: 1;
-            min-width: 280px;
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            max-height: 600px;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #e2e8f0;
-            position: sticky;
-            top: 20px;
-        }
-
-        /* ---------- MENU ---------- */
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .menu-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .menu-header h2 i {
-            color: #38bdf8;
-            margin-right: 8px;
-        }
-
-        .menu-header .filter-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .filter-tabs button {
-            background: #f1f5f9;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-            cursor: pointer;
-            transition: 0.25s;
-        }
-
-        .filter-tabs button:hover {
-            background: #e2e8f0;
-        }
-
-        .filter-tabs button.active {
-            background: #0f172a;
-            color: #fff;
-        }
-
-        /* Drink Grid */
-        .drink-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 18px;
-        }
-
-        .drink-card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 18px 14px 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid #eef2f6;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .drink-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-            border-color: #b9d4f0;
-        }
-
-        .drink-card .drink-icon {
-            font-size: 44px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .drink-card .drink-name {
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 2px;
-        }
-
-        .drink-card .drink-desc {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-
-        .drink-card .drink-price {
-            font-weight: 700;
-            color: #0f172a;
-            font-size: 18px;
-        }
-
-        .drink-card .drink-price small {
-            font-size: 13px;
-            font-weight: 400;
-            color: #64748b;
-        }
-
-        .drink-card .add-btn {
-            margin-top: 10px;
-            background: #0f172a;
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            padding: 6px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .drink-card .add-btn:hover {
-            background: #1e293b;
-        }
-
-        .drink-card .add-btn i {
-            font-size: 12px;
-        }
-
-        .drink-card .badge-popular {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #f59e0b;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 30px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ---------- CART SECTION ---------- */
-        .cart-section h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .cart-section h3 i {
-            color: #38bdf8;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin-bottom: 14px;
-        }
-
-        .cart-items::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .cart-items::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .cart-item-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-item-info .ci-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .cart-item-info .ci-detail {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .cart-item-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cart-item-actions .qty-btn {
-            background: #f1f5f9;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cart-item-actions .qty-btn:hover {
-            background: #e2e8f0;
-        }
-
-        .cart-item-actions .qty-num {
-            font-weight: 600;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .cart-item-actions .item-price {
-            font-weight: 700;
-            font-size: 14px;
-            min-width: 50px;
-            text-align: right;
-        }
-
-        .cart-empty {
-            text-align: center;
-            color: #94a3b8;
-            padding: 40px 0;
-            font-size: 14px;
-        }
-
-        .cart-empty i {
-            font-size: 40px;
-            color: #cbd5e1;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        /* Cart Footer */
-        .cart-footer {
-            border-top: 2px solid #e2e8f0;
-            padding-top: 14px;
-        }
-
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        .cart-total span:last-child {
-            color: #0f172a;
-        }
-
-        .payment-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .payment-options button {
-            flex: 1;
-            min-width: 80px;
-            padding: 10px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            background: #fff;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .payment-options button:hover {
-            border-color: #94a3b8;
-        }
-
-        .payment-options button.pay-cash {
-            border-color: #22c55e;
-            background: #f0fdf4;
-            color: #16a34a;
-        }
-
-        .payment-options button.pay-cash:hover {
-            background: #dcfce7;
-        }
-
-        .payment-options button.pay-qr {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .payment-options button.pay-qr:hover {
-            background: #dbeafe;
-        }
-
-        .payment-options button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ---------- MODAL ---------- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .modal {
-            background: #fff;
-            border-radius: 28px;
-            max-width: 480px;
-            width: 100%;
-            padding: 32px 30px 30px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-            position: relative;
-            max-height: 95vh;
-            overflow-y: auto;
-        }
-
-        .modal .close-modal {
-            position: absolute;
-            top: 14px;
-            right: 18px;
-            background: none;
-            border: none;
-            font-size: 26px;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .modal .close-modal:hover {
-            color: #1e293b;
-            transform: rotate(90deg);
-        }
-
-        .modal h2 {
-            font-size: 24px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal h2 i {
-            color: #38bdf8;
-        }
-
-        .modal .subtitle {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .modal .order-summary {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px 18px;
-            margin-bottom: 22px;
-        }
-
-        .modal .order-summary .os-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            padding: 4px 0;
-        }
-
-        .modal .order-summary .os-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 18px;
-            padding-top: 10px;
-            border-top: 2px solid #e2e8f0;
-            margin-top: 8px;
-        }
-
-        /* QR Code */
-        .qr-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 18px 0 22px;
-        }
-
-        .qr-container #qrcode {
-            background: #fff;
-            padding: 12px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            border: 2px solid #eef2f6;
-        }
-
-        .qr-container .qr-label {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 10px;
-        }
-
-        .qr-container .qr-label strong {
-            color: #0f172a;
-        }
-
-        /* Payment Actions */
-        .payment-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .payment-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .payment-actions .btn-confirm {
-            background: #0f172a;
-            color: #fff;
-        }
-
-        .payment-actions .btn-confirm:hover {
-            background: #1e293b;
-        }
-
-        .payment-actions .btn-cancel {
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .payment-actions .btn-cancel:hover {
-            background: #e2e8f0;
-        }
-
-        /* ---------- TOAST ---------- */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #0f172a;
-            color: #fff;
-            padding: 14px 30px;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 15px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            pointer-events: none;
-            max-width: 90vw;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-            pointer-events: auto;
-        }
-
-        .toast i {
-            font-size: 20px;
-            color: #22c55e;
-        }
-
-        .toast a {
-            color: #38bdf8;
-            text-decoration: underline;
-            font-weight: 700;
-            pointer-events: auto;
-        }
-
-        /* ---------- RESPONSIVE ---------- */
-        @media (max-width: 780px) {
-            .header {
-                padding: 16px 18px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .header-left h1 {
-                font-size: 20px;
-            }
-
-            .header-right .telegram-link span {
-                display: none;
-            }
-            .header-right .telegram-link {
-                padding: 6px 10px;
-            }
-
-            .main-content {
-                padding: 16px;
-                flex-direction: column;
-            }
-
-            .cart-section {
-                max-height: none;
-                position: static;
-            }
-
-            .drink-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-
-            .modal {
-                padding: 24px 18px;
-                margin: 10px;
-            }
-        }
-
-        @media (max-width: 430px) {
-            .drink-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .drink-card {
-                padding: 14px 8px 12px;
-            }
-
-            .drink-card .drink-icon {
-                font-size: 34px;
-            }
-
-            .header-left h1 {
-                font-size: 17px;
-            }
-
-            .payment-options button {
-                font-size: 12px;
-                padding: 8px 4px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Chill & Fizz — Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B3D3E;
+    --bg2:#0F4B4D;
+    --card:#FDF6E9;
+    --card2:#FFFDF8;
+    --ink:#102A2B;
+    --ink-soft:#4d6667;
+    --mango:#FFB627;
+    --watermelon:#FF5D73;
+    --mint:#4ECDC4;
+    --line:rgba(253,246,233,0.14);
+    --shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 15% 0%, #10494b 0%, var(--bg) 45%, #082e2f 100%);
+    color:var(--card);
+    font-family:'Work Sans', sans-serif;
+    min-height:100vh;
+    padding-bottom:96px;
+  }
+  h1,h2,h3,.display{font-family:'Baloo 2', sans-serif;}
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{background:var(--mango); color:var(--ink);}
+
+  /* Header */
+  .header{
+    padding:22px 18px 14px;
+    display:flex; align-items:flex-start; justify-content:space-between;
+    position:relative;
+  }
+  .brand-mark{
+    display:flex; align-items:center; gap:12px;
+  }
+  .bubble-logo{
+    width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(135deg, var(--mango), var(--watermelon));
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px; flex-shrink:0;
+    box-shadow: 0 4px 14px rgba(255,93,115,0.35);
+  }
+  .brand-name{font-size:22px; font-weight:700; margin:0; letter-spacing:0.3px;}
+  .brand-tag{margin:2px 0 0; font-size:12.5px; color:#bfe3e0; font-weight:500;}
+  .header-actions{display:flex; gap:8px;}
+  .icon-btn{
+    width:42px;height:42px;border-radius:14px;
+    background:rgba(253,246,233,0.08);
+    border:1px solid var(--line);
+    color:var(--card2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px; position:relative;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .icon-btn:active{transform:scale(0.92);}
+  .icon-btn:hover{background:rgba(253,246,233,0.14);}
+  .cart-badge{
+    position:absolute; top:-6px; right:-6px;
+    background:var(--watermelon); color:white;
+    font-size:11px; font-weight:700;
+    min-width:19px; height:19px; border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 4px; border:2px solid var(--bg);
+  }
+
+  /* Categories */
+  .cat-row{
+    display:flex; gap:8px; overflow-x:auto; padding:6px 18px 18px;
+    scrollbar-width:none;
+  }
+  .cat-row::-webkit-scrollbar{display:none;}
+  .cat-pill{
+    flex-shrink:0; padding:9px 16px; border-radius:999px;
+    border:1px solid var(--line); background:rgba(253,246,233,0.06);
+    color:#d9efec; font-size:13.5px; font-weight:600;
+    white-space:nowrap; transition:all .15s ease;
+  }
+  .cat-pill.active{
+    background:var(--mango); color:var(--ink); border-color:var(--mango);
+    box-shadow:0 6px 16px rgba(255,182,39,0.35);
+  }
+
+  /* Menu grid */
+  .menu-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+    padding:0 18px 12px;
+  }
+  .drink-card{
+    background:var(--card); border-radius:20px; padding:14px;
+    color:var(--ink); position:relative; overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:6px;
+    border:1px solid rgba(16,42,43,0.05);
+  }
+  .drink-icon{
+    width:52px;height:52px;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px; margin-bottom:2px;
+  }
+  .drink-name{font-family:'Baloo 2'; font-weight:700; font-size:15.5px; margin:0; line-height:1.2;}
+  .drink-desc{font-size:11.5px; color:var(--ink-soft); margin:0; line-height:1.35; min-height:30px;}
+  .drink-foot{display:flex; align-items:center; justify-content:space-between; margin-top:4px;}
+  .drink-price{font-weight:700; font-size:14.5px;}
+  .add-btn{
+    width:34px;height:34px;border-radius:12px; border:none;
+    background:var(--ink); color:var(--card);
+    font-size:18px; font-weight:700; line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s ease;
+  }
+  .add-btn:active{transform:scale(0.88);}
+  .qty-stepper{
+    display:flex; align-items:center; gap:8px;
+    background:var(--ink); border-radius:12px; padding:3px;
+  }
+  .qty-stepper button{
+    width:26px;height:26px;border:none;border-radius:9px;
+    background:rgba(253,246,233,0.12); color:var(--card);
+    font-size:15px; font-weight:700; display:flex;align-items:center;justify-content:center;
+  }
+  .qty-stepper span{color:var(--card); font-weight:700; font-size:13.5px; min-width:14px; text-align:center;}
+
+  /* Floating cart bar */
+  .cart-bar{
+    position:fixed; left:16px; right:16px; bottom:16px;
+    background:linear-gradient(120deg, var(--watermelon), #ff7a63);
+    border-radius:18px; padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+    box-shadow:0 12px 30px rgba(255,93,115,0.4);
+    color:white; z-index:40; transform:translateY(120%);
+    transition:transform .25s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .cart-bar.show{transform:translateY(0);}
+  .cart-bar .cb-left{display:flex; flex-direction:column;}
+  .cb-count{font-size:12px; opacity:0.92; font-weight:600;}
+  .cb-total{font-family:'Baloo 2'; font-size:17px; font-weight:700;}
+  .cb-btn{
+    background:white; color:var(--watermelon); border:none;
+    padding:10px 18px; border-radius:12px; font-weight:700; font-size:14px;
+  }
+
+  /* Overlay & sheets */
+  .overlay{
+    position:fixed; inset:0; background:rgba(6,26,27,0.6);
+    backdrop-filter:blur(2px); z-index:50; display:none;
+  }
+  .overlay.show{display:block;}
+  .sheet{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:var(--card); color:var(--ink);
+    border-radius:26px 26px 0 0; padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+    max-height:86vh; overflow-y:auto;
+    transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.9,.3,1.1);
+  }
+  .sheet.show{transform:translateY(0);}
+  .sheet-handle{
+    width:40px;height:4px;background:rgba(16,42,43,0.18); border-radius:4px;
+    margin:0 auto 14px;
+  }
+  .sheet h2{margin:0 0 14px; font-size:19px;}
+  .close-x{
+    position:absolute; top:16px; right:16px; width:32px;height:32px;
+    border-radius:10px; border:none; background:rgba(16,42,43,0.06);
+    font-size:16px; color:var(--ink);
+  }
+
+  /* Cart items */
+  .cart-row{
+    display:flex; align-items:center; gap:12px; padding:10px 0;
+    border-bottom:1px solid rgba(16,42,43,0.08);
+  }
+  .cart-row .ci-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px; flex-shrink:0;}
+  .cart-row .ci-info{flex:1; min-width:0;}
+  .cart-row .ci-name{font-weight:700; font-size:14px; margin:0;}
+  .cart-row .ci-price{font-size:12px; color:var(--ink-soft); margin:2px 0 0;}
+  .cart-empty{text-align:center; padding:40px 10px; color:var(--ink-soft);}
+  .cart-empty .em{font-size:38px; margin-bottom:8px;}
+  .subtotal-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 0 4px; font-family:'Baloo 2'; font-size:18px; font-weight:700;
+  }
+  .primary-btn{
+    width:100%; padding:15px; border:none; border-radius:14px;
+    background:var(--ink); color:var(--card); font-weight:700; font-size:15px;
+    margin-top:12px; transition:opacity .15s;
+  }
+  .primary-btn:disabled{opacity:0.4;}
+  .ghost-btn{
+    width:100%; padding:13px; border:1px solid rgba(16,42,43,0.15); border-radius:14px;
+    background:transparent; color:var(--ink); font-weight:600; font-size:13.5px; margin-top:8px;
+  }
+
+  /* Form */
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px;}
+  .field input, .field textarea{
+    width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid rgba(16,42,43,0.12);
+    font-family:inherit; font-size:14.5px; background:var(--card2); color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--mint); border-color:var(--mint);}
+
+  .pay-tabs{display:flex; gap:8px; margin-bottom:14px;}
+  .pay-tab{
+    flex:1; padding:12px; border-radius:14px; border:1.5px solid rgba(16,42,43,0.12);
+    background:var(--card2); font-weight:700; font-size:13.5px; color:var(--ink-soft);
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .pay-tab .pt-icon{font-size:19px;}
+  .pay-tab.active{border-color:var(--mint); background:rgba(78,205,196,0.14); color:var(--ink);}
+
+  .qr-box{
+    background:var(--card2); border-radius:16px; padding:16px; text-align:center;
+    border:1.5px dashed rgba(16,42,43,0.18); margin-bottom:12px;
+  }
+  .qr-box img{width:170px;height:170px; object-fit:contain; border-radius:10px; background:white; padding:8px;}
+  .qr-placeholder{
+    width:170px;height:170px; margin:0 auto; border-radius:10px; background:#eef2f2;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:12px; padding:10px; text-align:center;
+  }
+  .upload-zone{
+    border:1.5px dashed rgba(16,42,43,0.22); border-radius:14px; padding:16px;
+    text-align:center; background:var(--card2); position:relative;
+  }
+  .upload-zone input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .upload-preview{width:100%; max-height:180px; object-fit:contain; border-radius:10px; margin-top:10px;}
+
+  /* Order slip / ticket */
+  .ticket{
+    background:var(--card2); border-radius:18px; position:relative;
+    padding:22px 20px 26px; margin-top:6px;
+    --scallop: radial-gradient(circle 7px at 7px 0, transparent 7px, var(--card) 7.5px) repeat-x;
+  }
+  .ticket-top-edge{
+    height:14px; margin:-22px -20px 12px;
+    background: radial-gradient(circle 8px at 8px 8px, var(--card) 8px, transparent 8.5px) repeat-x left top / 16px 16px;
+  }
+  .ticket-header{text-align:center; margin-bottom:14px;}
+  .ticket-header .tk-emoji{font-size:30px;}
+  .ticket-header h3{margin:6px 0 2px; font-size:18px;}
+  .ticket-header .tk-id{font-size:12px; color:var(--ink-soft); letter-spacing:1px;}
+  .tk-line{border-top:1.5px dashed rgba(16,42,43,0.2); margin:12px 0;}
+  .tk-row{display:flex; justify-content:space-between; font-size:13.5px; padding:4px 0;}
+  .tk-row.total{font-weight:700; font-size:16px; font-family:'Baloo 2';}
+  .tk-status{
+    margin-top:14px; padding:10px 12px; border-radius:12px; font-size:12.5px; font-weight:600;
+    display:flex; align-items:center; gap:8px;
+  }
+  .tk-status.ok{background:rgba(78,205,196,0.18); color:#0f5c56;}
+  .tk-status.err{background:rgba(255,93,115,0.16); color:#a52e42;}
+  .tk-status.pending{background:rgba(255,182,39,0.2); color:#8a5a05;}
+
+  .help-text{font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin-top:4px;}
+  .link-like{color:var(--mint); font-weight:700;}
+  .section-title{font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-soft); margin:16px 0 8px;}
+  .toast{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-140%);
+    background:var(--ink); color:var(--card); padding:11px 18px; border-radius:12px;
+    font-size:13px; font-weight:600; z-index:100; transition:transform .25s ease;
+    box-shadow:0 8px 22px rgba(0,0,0,0.3);
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .empty-cat{padding:40px 20px; text-align:center; color:#bfe3e0; grid-column:1/-1;}
+</style>
 </head>
 <body>
 
-    <!-- ========== APP ========== -->
-    <div class="app" id="app">
+<div class="header">
+  <div class="brand-mark">
+    <div class="bubble-logo">🧋</div>
+    <div>
+      <h1 class="brand-name" id="shopNameDisplay">Chill & Fizz</h1>
+      <p class="brand-tag" id="shopTagDisplay">Cold drinks, made to order</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="ordersBtn" title="My orders">🧾</button>
+    <button class="icon-btn" id="settingsBtn" title="Shop settings">⚙️</button>
+    <button class="icon-btn" id="cartIconBtn" title="Cart">
+      🛒
+      <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
+    </button>
+  </div>
+</div>
 
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <i class="fas fa-mug-saucer"></i>
-                <h1>Chill<span>Sip</span></h1>
-            </div>
-            <div class="header-right">
-                <span class="header-status">
-                    <span class="dot"></span> Open
-                </span>
-                <a href="https://t.me/your_channel" target="_blank" class="telegram-link" id="telegramLink">
-                    <i class="fab fa-telegram-plane"></i>
-                    <span>Join</span>
-                </a>
-                <button class="cart-btn" id="cartToggle" aria-label="Open cart">
-                    <i class="fas fa-cart-shopping"></i>
-                    <span class="cart-badge" id="cartBadge">0</span>
-                </button>
-            </div>
-        </header>
+<div class="cat-row" id="catRow"></div>
+<div class="menu-grid" id="menuGrid"></div>
 
-        <!-- MAIN -->
-        <div class="main-content">
+<div class="cart-bar" id="cartBar">
+  <div class="cb-left">
+    <span class="cb-count" id="cbCount">0 items</span>
+    <span class="cb-total" id="cbTotal">0</span>
+  </div>
+  <button class="cb-btn" id="viewCartBtn">View cart →</button>
+</div>
 
-            <!-- MENU -->
-            <section class="menu-section">
-                <div class="menu-header">
-                    <h2><i class="fas fa-glass-water"></i> Cold Drinks</h2>
-                    <div class="filter-tabs">
-                        <button class="active" data-filter="all">All</button>
-                        <button data-filter="coffee">Coffee</button>
-                        <button data-filter="tea">Tea</button>
-                        <button data-filter="fruity">Fruity</button>
-                        <button data-filter="special">Special</button>
-                    </div>
-                </div>
+<div class="overlay" id="overlay"></div>
 
-                <div class="drink-grid" id="drinkGrid">
-                    <!-- drinks injected by JS -->
-                </div>
-            </section>
+<!-- CART SHEET -->
+<div class="sheet" id="cartSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeCart">✕</button>
+  <h2>Your order</h2>
+  <div id="cartItems"></div>
+  <div id="cartFooter"></div>
+</div>
 
-            <!-- CART (sticky) -->
-            <aside class="cart-section" id="cartSection">
-                <h3><i class="fas fa-cart-shopping"></i> Your Order</h3>
-                <div class="cart-items" id="cartItems">
-                    <div class="cart-empty">
-                        <i class="fas fa-mug-empty"></i>
-                        No drinks yet<br /><span style="font-size:13px;">Tap a drink to add</span>
-                    </div>
-                </div>
-                <div class="cart-footer">
-                    <div class="cart-total">
-                        <span>Total</span>
-                        <span id="cartTotal">$0.00</span>
-                    </div>
-                    <div class="payment-options">
-                        <button class="pay-cash" id="payCashBtn" disabled>
-                            <i class="fas fa-money-bill-wave"></i> Cash
-                        </button>
-                        <button class="pay-qr" id="payQrBtn" disabled>
-                            <i class="fas fa-qrcode"></i> QR Pay
-                        </button>
-                    </div>
-                </div>
-            </aside>
+<!-- CHECKOUT SHEET -->
+<div class="sheet" id="checkoutSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeCheckout">✕</button>
+  <h2>Checkout</h2>
 
+  <div class="field">
+    <label>Your name</label>
+    <input type="text" id="custName" placeholder="e.g. Nina">
+  </div>
+  <div class="field">
+    <label>Phone number</label>
+    <input type="tel" id="custPhone" placeholder="e.g. 081 234 5678">
+  </div>
+  <div class="field">
+    <label>Note (optional)</label>
+    <input type="text" id="custNote" placeholder="e.g. less ice, table 4">
+  </div>
+
+  <div class="section-title">Payment method</div>
+  <div class="pay-tabs">
+    <button class="pay-tab active" id="tabCash" data-method="cash">
+      <span class="pt-icon">💵</span> Cash
+    </button>
+    <button class="pay-tab" id="tabQR" data-method="qr">
+      <span class="pt-icon">📱</span> QR Payment
+    </button>
+  </div>
+
+  <div id="cashPanel">
+    <p class="help-text">Pay in cash when your order is ready. Show your order number at the counter.</p>
+  </div>
+
+  <div id="qrPanel" style="display:none;">
+    <div class="qr-box" id="qrBox">
+      <div class="qr-placeholder" id="qrPlaceholder">Shop hasn't uploaded a QR code yet — ask the shop to add one in ⚙️ Settings.</div>
+    </div>
+    <div class="section-title" style="margin-top:0;">Upload payment slip</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" id="slipInput">
+      <div id="uploadZoneText">📎 Tap to upload a screenshot of your payment</div>
+      <img id="slipPreview" class="upload-preview" style="display:none;">
+    </div>
+    <p class="help-text" id="slipHelp">We'll send this image straight to the shop along with your order.</p>
+  </div>
+
+  <button class="primary-btn" id="placeOrderBtn">Place order</button>
+</div>
+
+<!-- CONFIRMATION SHEET -->
+<div class="sheet" id="confirmSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeConfirm">✕</button>
+  <div class="ticket" id="ticketContent"></div>
+  <button class="primary-btn" id="doneBtn">Done</button>
+</div>
+
+<!-- MY ORDERS SHEET -->
+<div class="sheet" id="ordersSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeOrders">✕</button>
+  <h2>My orders</h2>
+  <div id="ordersList"></div>
+</div>
+
+<!-- ADMIN SIGN-IN SHEET -->
+<div class="sheet" id="adminAuthSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeAdminAuth">✕</button>
+  <h2 id="adminAuthTitle">Admin sign in</h2>
+  <p class="help-text" id="adminAuthHelp" style="margin-bottom:14px;">Enter the admin password to open shop settings.</p>
+
+  <div id="adminAuthLoginFields">
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="adminPasswordInput" placeholder="••••••••">
+    </div>
+    <p class="help-text" id="adminAuthError" style="color:#a52e42; display:none;">Incorrect password. Try again.</p>
+  </div>
+
+  <div id="adminAuthCreateFields" style="display:none;">
+    <div class="field">
+      <label>Create admin password</label>
+      <input type="password" id="adminNewPassword" placeholder="At least 4 characters">
+    </div>
+    <div class="field">
+      <label>Confirm password</label>
+      <input type="password" id="adminConfirmPassword" placeholder="Repeat password">
+    </div>
+    <p class="help-text" id="adminCreateError" style="color:#a52e42; display:none;"></p>
+  </div>
+
+  <button class="primary-btn" id="adminAuthSubmit">Sign in</button>
+  <p class="help-text" style="margin-top:10px;">This is a light lock for casual visitors, not a secure vault — anyone who reads the app's code can bypass it. Don't put anything here you'd be upset to have exposed.</p>
+</div>
+
+<!-- SETTINGS SHEET -->
+<div class="sheet" id="settingsSheet">
+  <div class="sheet-handle"></div>
+  <button class="close-x" id="closeSettings">✕</button>
+  <h2>Shop settings</h2>
+  <p class="help-text" style="margin-bottom:14px;">This connects the app to your shop's Telegram, so every order lands in your chat as an order slip. Settings are shared — anyone signed in as admin can view and edit them, so only share the password with your team.</p>
+
+  <div class="field">
+    <label>Shop name</label>
+    <input type="text" id="setShopName">
+  </div>
+  <div class="field">
+    <label>Tagline</label>
+    <input type="text" id="setShopTag">
+  </div>
+  <div class="field">
+    <label>Currency symbol</label>
+    <input type="text" id="setCurrency" placeholder="$">
+  </div>
+
+  <div class="section-title">Telegram bot</div>
+  <div class="field">
+    <label>Bot token</label>
+    <input type="text" id="setBotToken" placeholder="123456:ABC-DEF...">
+  </div>
+  <div class="field">
+    <label>Chat ID</label>
+    <input type="text" id="setChatId" placeholder="e.g. -1001234567890">
+  </div>
+  <p class="help-text">
+    1. Message <span class="link-like">@BotFather</span> on Telegram, send <b>/newbot</b>, and copy the token.<br>
+    2. Add the bot to your group (or DM it), send any message, then open
+    <span class="link-like">https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</span> in a browser to find the chat id.
+  </p>
+
+  <div class="section-title">Payment QR code</div>
+  <div class="upload-zone" id="qrUploadZone">
+    <input type="file" accept="image/*" id="qrUploadInput">
+    <div id="qrUploadText">📎 Tap to upload your QR payment code</div>
+    <img id="qrUploadPreview" class="upload-preview" style="display:none;">
+  </div>
+
+  <button class="primary-btn" id="saveSettingsBtn">Save settings</button>
+  <button class="ghost-btn" id="testTelegramBtn">Send test message</button>
+
+  <div class="section-title">Admin password</div>
+  <div class="field">
+    <label>New password</label>
+    <input type="password" id="changePassNew" placeholder="Leave blank to keep current">
+  </div>
+  <button class="ghost-btn" id="changePassBtn">Update password</button>
+  <button class="ghost-btn" id="adminLockBtn">Lock admin</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const CATS = ["All","Milk Tea","Fruit Tea","Soda Float","Smoothie"];
+  const DEFAULT_MENU = [
+    {id:"m1", name:"Classic Milk Tea", desc:"Black tea, creamy milk, classic sweetness", price:45, cat:"Milk Tea", icon:"🧋", color:"#e9d3ff"},
+    {id:"m2", name:"Brown Sugar Boba", desc:"Chewy tapioca pearls, brown sugar syrup", price:55, cat:"Milk Tea", icon:"🥤", color:"#f5deb3"},
+    {id:"m3", name:"Thai Iced Tea", desc:"Bold orange tea, condensed milk", price:45, cat:"Milk Tea", icon:"🧃", color:"#ffd9a0"},
+    {id:"m4", name:"Lychee Fruit Tea", desc:"Fresh lychee, jasmine green tea", price:50, cat:"Fruit Tea", icon:"🍹", color:"#ffd6e0"},
+    {id:"m5", name:"Passionfruit Green Tea", desc:"Tangy passionfruit, chilled green tea", price:48, cat:"Fruit Tea", icon:"🍑", color:"#ffe8b8"},
+    {id:"m6", name:"Blue Ocean Soda Float", desc:"Blue soda, vanilla ice cream", price:40, cat:"Soda Float", icon:"🧊", color:"#c9f0ff"},
+    {id:"m7", name:"Strawberry Cream Soda", desc:"Strawberry soda, whipped cream", price:45, cat:"Soda Float", icon:"🍓", color:"#ffd0da"},
+    {id:"m8", name:"Mango Smoothie", desc:"Real mango, blended thick and cold", price:55, cat:"Smoothie", icon:"🥭", color:"#ffe0a3"},
+    {id:"m9", name:"Avocado Smoothie", desc:"Creamy avocado, condensed milk", price:58, cat:"Smoothie", icon:"🥑", color:"#d7f2c8"},
+  ];
+
+  let config = {shopName:"Chill & Fizz", shopTag:"Cold drinks, made to order", currency:"$", botToken:"", chatId:"", qrImage:"", adminPasswordHash:""};
+  let menu = DEFAULT_MENU;
+  let cart = {}; // id -> qty
+  let activeCat = "All";
+  let payMethod = "cash";
+  let slipDataUrl = null;
+  let settingsQrDataUrl = null;
+  let lastOrder = null;
+  let adminUnlocked = false; // resets each page load — admin must sign in again per session
+
+  const $ = (id)=>document.getElementById(id);
+
+  function toast(msg){
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+
+  async function loadState(){
+    try{
+      const c = await window.storage.get("shop-config", true);
+      if(c && c.value) config = Object.assign(config, JSON.parse(c.value));
+    }catch(e){}
+    try{
+      const m = await window.storage.get("menu-items", true);
+      if(m && m.value) menu = JSON.parse(m.value);
+    }catch(e){}
+    renderHeader();
+    renderCats();
+    renderMenu();
+  }
+
+  async function saveConfig(){
+    try{ await window.storage.set("shop-config", JSON.stringify(config), true); }
+    catch(e){ toast("Could not save settings"); }
+  }
+
+  async function saveOrderLocal(order){
+    try{
+      const existing = await window.storage.get("my-orders", false).catch(()=>null);
+      let list = [];
+      if(existing && existing.value) list = JSON.parse(existing.value);
+      list.unshift(order);
+      list = list.slice(0,20);
+      await window.storage.set("my-orders", JSON.stringify(list), false);
+    }catch(e){}
+  }
+
+  function renderHeader(){
+    $("shopNameDisplay").textContent = config.shopName || "Chill & Fizz";
+    $("shopTagDisplay").textContent = config.shopTag || "Cold drinks, made to order";
+    $("setShopName").value = config.shopName || "";
+    $("setShopTag").value = config.shopTag || "";
+    $("setCurrency").value = config.currency || "$";
+    $("setBotToken").value = config.botToken || "";
+    $("setChatId").value = config.chatId || "";
+    if(config.qrImage){
+      $("qrPlaceholder").style.display = "none";
+      let img = document.getElementById("qrImgDisplay");
+      if(!img){
+        img = document.createElement("img");
+        img.id = "qrImgDisplay";
+        $("qrBox").appendChild(img);
+      }
+      img.src = config.qrImage;
+    }
+  }
+
+  function renderCats(){
+    $("catRow").innerHTML = CATS.map(c=>
+      `<button class="cat-pill ${c===activeCat?'active':''}" data-cat="${c}">${c}</button>`
+    ).join("");
+    $("catRow").querySelectorAll(".cat-pill").forEach(btn=>{
+      btn.onclick = ()=>{ activeCat = btn.dataset.cat; renderCats(); renderMenu(); };
+    });
+  }
+
+  function fmtPrice(n){ return `${config.currency||"$"}${n}`; }
+
+  function renderMenu(){
+    const items = activeCat==="All" ? menu : menu.filter(i=>i.cat===activeCat);
+    if(items.length===0){
+      $("menuGrid").innerHTML = `<div class="empty-cat">No drinks in this category yet 🥤</div>`;
+      return;
+    }
+    $("menuGrid").innerHTML = items.map(item=>{
+      const qty = cart[item.id]||0;
+      return `<div class="drink-card">
+        <div class="drink-icon" style="background:${item.color}">${item.icon}</div>
+        <p class="drink-name">${item.name}</p>
+        <p class="drink-desc">${item.desc}</p>
+        <div class="drink-foot">
+          <span class="drink-price">${fmtPrice(item.price)}</span>
+          ${qty>0 ? `
+            <div class="qty-stepper">
+              <button data-act="dec" data-id="${item.id}">−</button>
+              <span>${qty}</span>
+              <button data-act="inc" data-id="${item.id}">+</button>
+            </div>` : `<button class="add-btn" data-act="inc" data-id="${item.id}">+</button>`}
         </div>
-    </div>
+      </div>`;
+    }).join("");
+    $("menuGrid").querySelectorAll("[data-act]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.dataset.id;
+        if(btn.dataset.act==="inc") cart[id] = (cart[id]||0)+1;
+        else { cart[id] = (cart[id]||0)-1; if(cart[id]<=0) delete cart[id]; }
+        renderMenu();
+        renderCartBar();
+      };
+    });
+  }
 
-    <!-- ========== MODAL ========== -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="close-modal" id="closeModal">&times;</button>
+  function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+  function cartTotal(){
+    return Object.entries(cart).reduce((sum,[id,qty])=>{
+      const item = menu.find(m=>m.id===id);
+      return sum + (item? item.price*qty : 0);
+    },0);
+  }
 
-            <h2 id="modalTitle"><i class="fas fa-qrcode"></i> Payment</h2>
-            <p class="subtitle" id="modalSubtitle">Review your order and complete payment.</p>
+  function renderCartBar(){
+    const n = cartCount();
+    const bar = $("cartBar");
+    if(n>0){
+      bar.classList.add("show");
+      $("cbCount").textContent = `${n} item${n>1?'s':''}`;
+      $("cbTotal").textContent = fmtPrice(cartTotal());
+      $("cartBadge").style.display = "flex";
+      $("cartBadge").textContent = n;
+    } else {
+      bar.classList.remove("show");
+      $("cartBadge").style.display = "none";
+    }
+  }
 
-            <div class="order-summary" id="orderSummary">
-                <!-- populated by JS -->
-            </div>
-
-            <!-- QR Container (hidden for cash) -->
-            <div class="qr-container" id="qrContainer" style="display:none;">
-                <div id="qrcode"></div>
-                <p class="qr-label">
-                    <i class="fas fa-phone"></i> Scan with your banking app<br />
-                    <strong>ChillSip • Order #<span id="qrOrderId">0000</span></strong>
-                </p>
-            </div>
-
-            <div class="payment-actions">
-                <button class="btn-confirm" id="confirmPayment">
-                    <i class="fas fa-check"></i> Confirm Payment
-                </button>
-                <button class="btn-cancel" id="cancelPayment">Cancel</button>
-            </div>
+  function renderCartSheet(){
+    const entries = Object.entries(cart);
+    if(entries.length===0){
+      $("cartItems").innerHTML = `<div class="cart-empty"><div class="em">🧋</div>Your cart is empty<br>Add a drink to get started</div>`;
+      $("cartFooter").innerHTML = "";
+      return;
+    }
+    $("cartItems").innerHTML = entries.map(([id,qty])=>{
+      const item = menu.find(m=>m.id===id);
+      if(!item) return "";
+      return `<div class="cart-row">
+        <div class="ci-icon" style="background:${item.color}">${item.icon}</div>
+        <div class="ci-info">
+          <p class="ci-name">${item.name}</p>
+          <p class="ci-price">${fmtPrice(item.price)} each</p>
         </div>
-    </div>
+        <div class="qty-stepper" style="background:${'#102A2B'}">
+          <button data-act="dec" data-id="${id}">−</button>
+          <span>${qty}</span>
+          <button data-act="inc" data-id="${id}">+</button>
+        </div>
+      </div>`;
+    }).join("");
+    $("cartItems").querySelectorAll("[data-act]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.dataset.id;
+        if(btn.dataset.act==="inc") cart[id] = (cart[id]||0)+1;
+        else { cart[id] = (cart[id]||0)-1; if(cart[id]<=0) delete cart[id]; }
+        renderCartSheet(); renderCartBar(); renderMenu();
+      };
+    });
+    $("cartFooter").innerHTML = `
+      <div class="subtotal-row"><span>Subtotal</span><span>${fmtPrice(cartTotal())}</span></div>
+      <button class="primary-btn" id="toCheckoutBtn">Continue to checkout</button>
+    `;
+    $("toCheckoutBtn").onclick = ()=>{ closeSheet("cartSheet"); openSheet("checkoutSheet"); };
+  }
 
-    <!-- ========== TOAST ========== -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMessage">Order placed!</span>
-    </div>
+  function openSheet(id){
+    $("overlay").classList.add("show");
+    $(id).classList.add("show");
+  }
+  const ALL_SHEETS = ["cartSheet","checkoutSheet","confirmSheet","ordersSheet","settingsSheet","adminAuthSheet"];
+  function closeSheet(id){
+    $(id).classList.remove("show");
+    const anyOpen = ALL_SHEETS.some(s=>$(s).classList.contains("show"));
+    if(!anyOpen) $("overlay").classList.remove("show");
+  }
+  function closeAll(){
+    ALL_SHEETS.forEach(s=>$(s).classList.remove("show"));
+    $("overlay").classList.remove("show");
+  }
 
+  $("overlay").onclick = closeAll;
+  $("cartIconBtn").onclick = ()=>{ renderCartSheet(); openSheet("cartSheet"); };
+  $("viewCartBtn").onclick = ()=>{ renderCartSheet(); openSheet("cartSheet"); };
+  $("closeCart").onclick = ()=>closeSheet("cartSheet");
+  $("closeCheckout").onclick = ()=>closeSheet("checkoutSheet");
+  $("closeConfirm").onclick = ()=>{ closeSheet("confirmSheet"); };
+  $("doneBtn").onclick = ()=>{ closeSheet("confirmSheet"); };
+  $("closeOrders").onclick = ()=>closeSheet("ordersSheet");
+  $("closeSettings").onclick = ()=>closeSheet("settingsSheet");
 
-    <!-- ========== JAVASCRIPT ========== -->
-    <script>
-        (function() {
-            'use strict';
+  async function hashPassword(pw){
+    const enc = new TextEncoder().encode(pw);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
 
-            // ---------- DATA ----------
-            const drinks = [{
-                id: 1,
-                name: 'Iced Coffee',
-                icon: '☕',
-                desc: 'Smooth & bold',
-                price: 4.50,
-                category: 'coffee',
-                popular: true
-            }, {
-                id: 2,
-                name: 'Bubble Tea',
-                icon: '🧋',
-                desc: 'Tapioca pearls',
-                price: 5.25,
-                category: 'tea',
-                popular: true
-            }, {
-                id: 3,
-                name: 'Lemonade',
-                icon: '🍋',
-                desc: 'Fresh & tangy',
-                price: 3.75,
-                category: 'fruity',
-                popular: false
-            }, {
-                id: 4,
-                name: 'Iced Tea',
-                icon: '🍵',
-                desc: 'Peach flavor',
-                price: 3.50,
-                category: 'tea',
-                popular: false
-            }, {
-                id: 5,
-                name: 'Berry Smoothie',
-                icon: '🍓',
-                desc: 'Mixed berries',
-                price: 6.00,
-                category: 'fruity',
-                popular: true
-            }, {
-                id: 6,
-                name: 'Milkshake',
-                icon: '🥤',
-                desc: 'Vanilla bean',
-                price: 5.75,
-                category: 'special',
-                popular: false
-            }, {
-                id: 7,
-                name: 'Cold Brew',
-                icon: '🧊',
-                desc: 'Nitro infused',
-                price: 5.00,
-                category: 'coffee',
-                popular: false
-            }, {
-                id: 8,
-                name: 'Fruit Punch',
-                icon: '🍍',
-                desc: 'Tropical blend',
-                price: 4.25,
-                category: 'fruity',
-                popular: false
-            }, {
-                id: 9,
-                name: 'Matcha Latte',
-                icon: '🍵',
-                desc: 'Iced matcha',
-                price: 5.50,
-                category: 'tea',
-                popular: false
-            }, {
-                id: 10,
-                name: 'Soda Float',
-                icon: '🥤',
-                desc: 'Vanilla & cola',
-                price: 4.00,
-                category: 'special',
-                popular: false
-            }];
+  function openAdminAuth(){
+    $("adminAuthError").style.display = "none";
+    $("adminPasswordInput").value = "";
+    $("adminNewPassword").value = "";
+    $("adminConfirmPassword").value = "";
+    $("adminCreateError").style.display = "none";
+    if(config.adminPasswordHash){
+      $("adminAuthTitle").textContent = "Admin sign in";
+      $("adminAuthHelp").textContent = "Enter the admin password to open shop settings.";
+      $("adminAuthLoginFields").style.display = "block";
+      $("adminAuthCreateFields").style.display = "none";
+      $("adminAuthSubmit").textContent = "Sign in";
+    } else {
+      $("adminAuthTitle").textContent = "Set up admin access";
+      $("adminAuthHelp").textContent = "No admin password yet — create one to protect shop settings.";
+      $("adminAuthLoginFields").style.display = "none";
+      $("adminAuthCreateFields").style.display = "block";
+      $("adminAuthSubmit").textContent = "Create password & sign in";
+    }
+    openSheet("adminAuthSheet");
+  }
 
-            // ---------- STATE ----------
-            let cart = [];
-            let currentFilter = 'all';
-            let selectedPayment = null;
-            let orderId = Math.floor(1000 + Math.random() * 9000);
+  $("settingsBtn").onclick = ()=>{
+    if(adminUnlocked){ renderHeader(); openSheet("settingsSheet"); }
+    else openAdminAuth();
+  };
+  $("closeAdminAuth").onclick = ()=>closeSheet("adminAuthSheet");
 
-            // ---------- DOM REFS ----------
-            const drinkGrid = document.getElementById('drinkGrid');
-            const cartItemsEl = document.getElementById('cartItems');
-            const cartTotalEl = document.getElementById('cartTotal');
-            const cartBadge = document.getElementById('cartBadge');
-            const payCashBtn = document.getElementById('payCashBtn');
-            const payQrBtn = document.getElementById('payQrBtn');
-            const modalOverlay = document.getElementById('modalOverlay');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalSubtitle = document.getElementById('modalSubtitle');
-            const orderSummary = document.getElementById('orderSummary');
-            const qrContainer = document.getElementById('qrContainer');
-            const qrOrderId = document.getElementById('qrOrderId');
-            const confirmBtn = document.getElementById('confirmPayment');
-            const cancelBtn = document.getElementById('cancelPayment');
-            const closeModalBtn = document.getElementById('closeModal');
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            const telegramLink = document.getElementById('telegramLink');
+  $("adminAuthSubmit").onclick = async ()=>{
+    if(config.adminPasswordHash){
+      const entered = $("adminPasswordInput").value;
+      const hash = await hashPassword(entered);
+      if(hash === config.adminPasswordHash){
+        adminUnlocked = true;
+        closeSheet("adminAuthSheet");
+        renderHeader();
+        openSheet("settingsSheet");
+      } else {
+        $("adminAuthError").style.display = "block";
+      }
+    } else {
+      const pw = $("adminNewPassword").value;
+      const confirm = $("adminConfirmPassword").value;
+      if(pw.length < 4){
+        $("adminCreateError").textContent = "Password must be at least 4 characters.";
+        $("adminCreateError").style.display = "block";
+        return;
+      }
+      if(pw !== confirm){
+        $("adminCreateError").textContent = "Passwords don't match.";
+        $("adminCreateError").style.display = "block";
+        return;
+      }
+      config.adminPasswordHash = await hashPassword(pw);
+      await saveConfig();
+      adminUnlocked = true;
+      closeSheet("adminAuthSheet");
+      renderHeader();
+      openSheet("settingsSheet");
+      toast("Admin password created");
+    }
+  };
 
-            // ================================================================
-            // 🔐 TELEGRAM CONFIGURATION (DO NOT PUT TOKEN/CHAT ID HERE!)
-            // ================================================================
-            // ⚠️ SECURITY WARNING: Never expose your Bot Token or Chat ID in client-side code.
-            // Use a backend service (e.g., Cloud Function, AWS Lambda, or the Node.js server below).
-            // The backend should have the BOT_TOKEN and CHAT_ID stored as environment variables.
-            // This function sends the order data to YOUR backend endpoint.
-            // ================================================================
-            const TELEGRAM_API_ENDPOINT = '/api/send-telegram'; // <-- Change this to your backend URL
+  $("changePassBtn").onclick = async ()=>{
+    const pw = $("changePassNew").value;
+    if(!pw){ toast("Enter a new password first"); return; }
+    if(pw.length < 4){ toast("Password must be at least 4 characters"); return; }
+    config.adminPasswordHash = await hashPassword(pw);
+    await saveConfig();
+    $("changePassNew").value = "";
+    toast("Password updated");
+  };
 
-            async function sendOrderToTelegram(orderData) {
-                try {
-                    const response = await fetch(TELEGRAM_API_ENDPOINT, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderData)
-                    });
-                    const result = await response.json();
-                    if (!response.ok) {
-                        console.error('Telegram send failed:', result);
-                        return false;
-                    }
-                    console.log('✅ Telegram notification sent:', result);
-                    return true;
-                } catch (error) {
-                    console.error('❌ Error sending Telegram notification:', error);
-                    // Fallback: log it locally for development
-                    console.log('📨 Order data (for Telegram):', orderData);
-                    return false;
-                }
-            }
+  $("adminLockBtn").onclick = ()=>{
+    adminUnlocked = false;
+    closeSheet("settingsSheet");
+    toast("Admin locked");
+  };
+  $("ordersBtn").onclick = async ()=>{
+    let list = [];
+    try{
+      const r = await window.storage.get("my-orders", false);
+      if(r && r.value) list = JSON.parse(r.value);
+    }catch(e){}
+    if(list.length===0){
+      $("ordersList").innerHTML = `<div class="cart-empty"><div class="em">🧾</div>No orders yet</div>`;
+    } else {
+      $("ordersList").innerHTML = list.map(o=>`
+        <div class="cart-row" style="align-items:flex-start;">
+          <div class="ci-icon" style="background:#eef2f2;">🧾</div>
+          <div class="ci-info">
+            <p class="ci-name">Order #${o.id} · ${fmtPrice(o.total)}</p>
+            <p class="ci-price">${o.itemsSummary} — ${o.payMethod==='qr'?'QR payment':'Cash'}</p>
+            <p class="ci-price">${o.time}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+    openSheet("ordersSheet");
+  };
 
-            // ---------- RENDER MENU ----------
-            function renderMenu(filter = 'all') {
-                const filtered = filter === 'all' ?
-                    drinks :
-                    drinks.filter(d => d.category === filter);
+  // Payment tabs
+  $("tabCash").onclick = ()=>{ payMethod="cash"; $("tabCash").classList.add("active"); $("tabQR").classList.remove("active"); $("cashPanel").style.display="block"; $("qrPanel").style.display="none"; };
+  $("tabQR").onclick = ()=>{ payMethod="qr"; $("tabQR").classList.add("active"); $("tabCash").classList.remove("active"); $("cashPanel").style.display="none"; $("qrPanel").style.display="block"; };
 
-                drinkGrid.innerHTML = filtered.map(d => `
-                        <div class="drink-card" data-id="${d.id}">
-                            ${d.popular ? '<span class="badge-popular">🔥 Popular</span>' : ''}
-                            <span class="drink-icon">${d.icon}</span>
-                            <div class="drink-name">${d.name}</div>
-                            <div class="drink-desc">${d.desc}</div>
-                            <div class="drink-price">$${d.price.toFixed(2)} <small>each</small></div>
-                            <button class="add-btn" data-id="${d.id}">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
-                        </div>
-                    `).join('');
+  // Slip upload (customer)
+  $("slipInput").onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      slipDataUrl = reader.result;
+      $("slipPreview").src = slipDataUrl;
+      $("slipPreview").style.display = "block";
+      $("uploadZoneText").textContent = "✅ Slip uploaded — tap to change";
+    };
+    reader.readAsDataURL(file);
+  };
 
-                drinkGrid.querySelectorAll('.add-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(btn.dataset.id);
-                        addToCart(id);
-                    });
-                });
+  // QR upload (shop settings)
+  $("qrUploadInput").onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      settingsQrDataUrl = reader.result;
+      $("qrUploadPreview").src = settingsQrDataUrl;
+      $("qrUploadPreview").style.display = "block";
+      $("qrUploadText").textContent = "✅ QR uploaded — tap to change";
+    };
+    reader.readAsDataURL(file);
+  };
 
-                drinkGrid.querySelectorAll('.drink-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const id = parseInt(card.dataset.id);
-                        addToCart(id);
-                    });
-                });
-            }
+  $("saveSettingsBtn").onclick = async ()=>{
+    config.shopName = $("setShopName").value.trim() || "Chill & Fizz";
+    config.shopTag = $("setShopTag").value.trim() || "Cold drinks, made to order";
+    config.currency = $("setCurrency").value.trim() || "$";
+    config.botToken = $("setBotToken").value.trim();
+    config.chatId = $("setChatId").value.trim();
+    if(settingsQrDataUrl) config.qrImage = settingsQrDataUrl;
+    await saveConfig();
+    renderHeader();
+    renderMenu();
+    renderCartBar();
+    toast("Settings saved");
+  };
 
-            // ---------- CART OPERATIONS ----------
-            function addToCart(drinkId) {
-                const drink = drinks.find(d => d.id === drinkId);
-                if (!drink) return;
+  $("testTelegramBtn").onclick = async ()=>{
+    if(!config.botToken || !config.chatId){ toast("Add bot token & chat ID first"); return; }
+    $("testTelegramBtn").textContent = "Sending…";
+    const res = await sendTelegramMessage(`✅ Test message from ${config.shopName || "your shop"}'s order app. Your bot is connected!`);
+    $("testTelegramBtn").textContent = "Send test message";
+    toast(res.ok ? "Test message sent ✓" : `Failed: ${res.error}`);
+  };
 
-                const existing = cart.find(item => item.drinkId === drinkId);
-                if (existing) {
-                    existing.quantity += 1;
-                } else {
-                    cart.push({
-                        drinkId: drink.id,
-                        name: drink.name,
-                        price: drink.price,
-                        icon: drink.icon,
-                        quantity: 1
-                    });
-                }
-                updateCartUI();
-                showToast(`${drink.name} added to cart!`);
-            }
+  function dataURLtoBlob(dataUrl){
+    const [meta, b64] = dataUrl.split(",");
+    const mime = meta.match(/:(.*?);/)[1];
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], {type:mime});
+  }
 
-            function removeFromCart(drinkId) {
-                const idx = cart.findIndex(item => item.drinkId === drinkId);
-                if (idx === -1) return;
-                if (cart[idx].quantity > 1) {
-                    cart[idx].quantity -= 1;
-                } else {
-                    cart.splice(idx, 1);
-                }
-                updateCartUI();
-            }
+  async function sendTelegramMessage(text){
+    try{
+      const res = await fetch(`https://api.telegram.org/bot${config.botToken}/sendMessage`,{
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({chat_id: config.chatId, text, parse_mode:"HTML"})
+      });
+      const data = await res.json();
+      if(!data.ok) return {ok:false, error:data.description || "Telegram rejected the request"};
+      return {ok:true};
+    }catch(e){
+      return {ok:false, error:"Network error reaching Telegram"};
+    }
+  }
 
-            function getTotal() {
-                return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            }
+  async function sendTelegramPhoto(dataUrl, caption){
+    try{
+      const blob = dataURLtoBlob(dataUrl);
+      const form = new FormData();
+      form.append("chat_id", config.chatId);
+      form.append("caption", caption);
+      form.append("photo", blob, "payment-slip.jpg");
+      const res = await fetch(`https://api.telegram.org/bot${config.botToken}/sendPhoto`,{method:"POST", body: form});
+      const data = await res.json();
+      if(!data.ok) return {ok:false, error:data.description || "Telegram rejected the photo"};
+      return {ok:true};
+    }catch(e){
+      return {ok:false, error:"Network error reaching Telegram"};
+    }
+  }
 
-            function getItemCount() {
-                return cart.reduce((sum, item) => sum + item.quantity, 0);
-            }
+  function buildOrderText(order){
+    const lines = order.items.map(i=>`• ${i.name} ×${i.qty} — ${fmtPrice(i.price*i.qty)}`).join("\n");
+    return `🧾 <b>New order #${order.id}</b>\n${order.shopName}\n\n${lines}\n\n<b>Total: ${fmtPrice(order.total)}</b>\n\n👤 ${order.custName || "—"}\n📞 ${order.custPhone || "—"}${order.custNote ? `\n📝 ${order.custNote}` : ""}\n💳 Payment: ${order.payMethod==="qr" ? "QR (slip attached)" : "Cash on pickup"}\n🕒 ${order.time}`;
+  }
 
-            function updateCartUI() {
-                const count = getItemCount();
-                const total = getTotal();
+  $("placeOrderBtn").onclick = async ()=>{
+    const entries = Object.entries(cart);
+    if(entries.length===0){ toast("Your cart is empty"); return; }
+    if(payMethod==="qr" && !slipDataUrl){ toast("Please upload your payment slip"); return; }
 
-                cartBadge.textContent = count;
-                cartTotalEl.textContent = `$${total.toFixed(2)}`;
+    const items = entries.map(([id,qty])=>{
+      const item = menu.find(m=>m.id===id);
+      return {name:item.name, qty, price:item.price};
+    });
+    const total = cartTotal();
+    const order = {
+      id: Math.random().toString(36).slice(2,7).toUpperCase(),
+      shopName: config.shopName || "Chill & Fizz",
+      items, total,
+      itemsSummary: items.map(i=>`${i.name} ×${i.qty}`).join(", "),
+      custName: $("custName").value.trim(),
+      custPhone: $("custPhone").value.trim(),
+      custNote: $("custNote").value.trim(),
+      payMethod,
+      time: new Date().toLocaleString(),
+    };
+    lastOrder = order;
 
-                const hasItems = count > 0;
-                payCashBtn.disabled = !hasItems;
-                payQrBtn.disabled = !hasItems;
+    $("placeOrderBtn").disabled = true;
+    $("placeOrderBtn").textContent = "Sending to shop…";
 
-                if (cart.length === 0) {
-                    cartItemsEl.innerHTML = `
-                            <div class="cart-empty">
-                                <i class="fas fa-mug-empty"></i>
-                                No drinks yet<br /><span style="font-size:13px;">Tap a drink to add</span>
-                            </div>
-                        `;
-                    return;
-                }
+    let sendResult = {ok:false, error:"Shop hasn't connected Telegram yet"};
+    if(config.botToken && config.chatId){
+      sendResult = await sendTelegramMessage(buildOrderText(order));
+      if(sendResult.ok && payMethod==="qr" && slipDataUrl){
+        const photoResult = await sendTelegramPhoto(slipDataUrl, `Payment slip — Order #${order.id}`);
+        if(!photoResult.ok) sendResult = {ok:false, error:"Order sent, but slip photo failed: "+photoResult.error};
+      }
+    }
+    order.sendStatus = sendResult;
 
-                cartItemsEl.innerHTML = cart.map(item => `
-                        <div class="cart-item" data-id="${item.drinkId}">
-                            <div class="cart-item-info">
-                                <span class="ci-name">${item.icon} ${item.name}</span>
-                                <span class="ci-detail">$${item.price.toFixed(2)} each</span>
-                            </div>
-                            <div class="cart-item-actions">
-                                <button class="qty-btn" data-action="decr" data-id="${item.drinkId}">−</button>
-                                <span class="qty-num">${item.quantity}</span>
-                                <button class="qty-btn" data-action="incr" data-id="${item.drinkId}">+</button>
-                                <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        </div>
-                    `).join('');
+    await saveOrderLocal(order);
 
-                cartItemsEl.querySelectorAll('.qty-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(btn.dataset.id);
-                        const action = btn.dataset.action;
-                        if (action === 'incr') {
-                            const item = cart.find(i => i.drinkId === id);
-                            if (item) item.quantity += 1;
-                        } else {
-                            removeFromCart(id);
-                        }
-                        updateCartUI();
-                    });
-                });
-            }
+    $("placeOrderBtn").disabled = false;
+    $("placeOrderBtn").textContent = "Place order";
 
-            // ---------- FILTER TABS ----------
-            document.querySelectorAll('.filter-tabs button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentFilter = btn.dataset.filter;
-                    renderMenu(currentFilter);
-                });
-            });
+    cart = {}; slipDataUrl = null;
+    $("slipPreview").style.display="none";
+    $("uploadZoneText").textContent = "📎 Tap to upload a screenshot of your payment";
+    $("custName").value=""; $("custPhone").value=""; $("custNote").value="";
 
-            // ---------- MODAL ----------
-            function openModal(method) {
-                if (cart.length === 0) return;
-                selectedPayment = method;
+    renderMenu(); renderCartBar();
+    closeSheet("checkoutSheet");
+    renderTicket(order);
+    openSheet("confirmSheet");
+  };
 
-                if (method === 'cash') {
-                    modalTitle.innerHTML = '<i class="fas fa-money-bill-wave"></i> Cash Payment';
-                    modalSubtitle.textContent = 'Pay at the counter with cash.';
-                    qrContainer.style.display = 'none';
-                } else {
-                    modalTitle.innerHTML = '<i class="fas fa-qrcode"></i> QR Payment';
-                    modalSubtitle.textContent = 'Scan the QR code with your banking app.';
-                    qrContainer.style.display = 'flex';
-                    const qrData = `ChillSip Order #${orderId} | Total: $${getTotal().toFixed(2)}`;
-                    setTimeout(() => {
-                        const qrEl = document.getElementById('qrcode');
-                        qrEl.innerHTML = '';
-                        new QRCode(qrEl, {
-                            text: qrData,
-                            width: 160,
-                            height: 160,
-                            colorDark: '#0f172a',
-                            colorLight: '#ffffff',
-                            correctLevel: QRCode.CorrectLevel.H,
-                        });
-                    }, 50);
-                    qrOrderId.textContent = orderId;
-                }
+  function renderTicket(order){
+    const statusClass = order.sendStatus.ok ? "ok" : (config.botToken ? "err" : "pending");
+    const statusText = order.sendStatus.ok
+      ? "Sent to the shop's Telegram ✓"
+      : (config.botToken ? `Couldn't reach Telegram — ${order.sendStatus.error}` : "Shop hasn't connected Telegram yet — show this screen at the counter");
+    $("ticketContent").innerHTML = `
+      <div class="ticket-top-edge"></div>
+      <div class="ticket-header">
+        <div class="tk-emoji">🧋</div>
+        <h3>Order placed!</h3>
+        <div class="tk-id">ORDER #${order.id}</div>
+      </div>
+      <div class="tk-line"></div>
+      ${order.items.map(i=>`<div class="tk-row"><span>${i.name} ×${i.qty}</span><span>${fmtPrice(i.price*i.qty)}</span></div>`).join("")}
+      <div class="tk-line"></div>
+      <div class="tk-row total"><span>Total</span><span>${fmtPrice(order.total)}</span></div>
+      <div class="tk-row"><span>Payment</span><span>${order.payMethod==="qr"?"QR payment":"Cash"}</span></div>
+      <div class="tk-row"><span>Name</span><span>${order.custName || "—"}</span></div>
+      <div class="tk-status ${statusClass}">${statusText}</div>
+    `;
+  }
 
-                let html = '';
-                cart.forEach(item => {
-                    html += `
-                            <div class="os-item">
-                                <span>${item.icon} ${item.name} × ${item.quantity}</span>
-                                <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        `;
-                });
-                html += `
-                        <div class="os-total">
-                            <span>Total</span>
-                            <span>$${getTotal().toFixed(2)}</span>
-                        </div>
-                    `;
-                orderSummary.innerHTML = html;
-
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal() {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                selectedPayment = null;
-            }
-
-            // ---------- CONFIRM PAYMENT ----------
-            function confirmPayment() {
-                if (cart.length === 0) return;
-                const total = getTotal();
-                const method = selectedPayment === 'cash' ? 'Cash' : 'QR Pay';
-                const currentOrderId = orderId;
-
-                // 1. Close modal
-                closeModal();
-
-                // 2. Build order data for Telegram
-                const orderData = {
-                    orderId: currentOrderId,
-                    items: cart.map(item => ({
-                        name: `${item.icon} ${item.name}`,
-                        quantity: item.quantity,
-                        price: item.price
-                    })),
-                    total: total,
-                    paymentMethod: method,
-                    timestamp: new Date().toISOString()
-                };
-
-                // 3. Send to Telegram (via secure backend)
-                sendOrderToTelegram(orderData);
-
-                // 4. Show success toast with Telegram channel link
-                const telegramUrl = 'https://t.me/your_channel'; // Replace with your channel
-                const toastHtml =
-                    `✅ Order #${currentOrderId} placed! 📲 Admin notified. <a href="${telegramUrl}" target="_blank">Join Telegram</a>`;
-                showToast(toastHtml, true);
-
-                // 5. Reset cart
-                cart = [];
-                updateCartUI();
-                orderId = Math.floor(1000 + Math.random() * 9000);
-                document.getElementById('qrcode').innerHTML = '';
-            }
-
-            // ---------- TOAST ----------
-            function showToast(msg, isHtml = false) {
-                if (isHtml) {
-                    toastMsg.innerHTML = msg;
-                } else {
-                    toastMsg.textContent = msg;
-                }
-                toast.classList.add('show');
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => {
-                    toast.classList.remove('show');
-                    if (isHtml) toastMsg.textContent = 'Order placed!';
-                }, 7000);
-            }
-
-            // ---------- EVENT LISTENERS ----------
-            document.getElementById('cartToggle').addEventListener('click', () => {
-                document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-
-            payCashBtn.addEventListener('click', () => openModal('cash'));
-            payQrBtn.addEventListener('click', () => openModal('qr'));
-
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            confirmBtn.addEventListener('click', confirmPayment);
-
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
-            });
-
-            // ---------- INIT ----------
-            renderMenu('all');
-            updateCartUI();
-
-            setTimeout(() => {
-                showToast('🍹 Welcome to ChillSip!');
-            }, 300);
-
-        })();
-    </script>
-
+  loadState();
+})();
+</script>
 </body>
 </html>
