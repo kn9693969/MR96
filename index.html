@@ -48,6 +48,17 @@
     display:flex;align-items:center;justify-content:center;
     font-size:22px; flex-shrink:0;
     box-shadow: 0 4px 14px rgba(255,93,115,0.35);
+    position:relative; user-select:none;
+  }
+  .bubble-logo::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    border:2.5px solid var(--mint); opacity:0; transform:scale(0.8);
+    transition:none;
+  }
+  .bubble-logo.holding::after{
+    opacity:1; transform:scale(1);
+    transition: transform 0.9s linear, opacity 0.15s ease;
+    transform:scale(1.15);
   }
   .brand-name{font-size:22px; font-weight:700; margin:0; letter-spacing:0.3px;}
   .brand-tag{margin:2px 0 0; font-size:12.5px; color:#bfe3e0; font-weight:500;}
@@ -275,7 +286,7 @@
 
 <div class="header">
   <div class="brand-mark">
-    <div class="bubble-logo">🧋</div>
+    <div class="bubble-logo" id="logoLongPress">🧋</div>
     <div>
       <h1 class="brand-name" id="shopNameDisplay">Chill & Fizz</h1>
       <p class="brand-tag" id="shopTagDisplay">Cold drinks, made to order</p>
@@ -283,7 +294,6 @@
   </div>
   <div class="header-actions">
     <button class="icon-btn" id="ordersBtn" title="My orders">🧾</button>
-    <button class="icon-btn" id="settingsBtn" title="Shop settings">⚙️</button>
     <button class="icon-btn" id="cartIconBtn" title="Cart">
       🛒
       <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
@@ -706,10 +716,26 @@
     openSheet("adminAuthSheet");
   }
 
-  $("settingsBtn").onclick = ()=>{
-    if(adminUnlocked){ renderHeader(); openSheet("settingsSheet"); }
-    else openAdminAuth();
-  };
+  let longPressTimer = null;
+  function startLongPress(){
+    const el = $("logoLongPress");
+    el.classList.add("holding");
+    longPressTimer = setTimeout(()=>{
+      el.classList.remove("holding");
+      if(adminUnlocked){ renderHeader(); openSheet("settingsSheet"); }
+      else openAdminAuth();
+    }, 900);
+  }
+  function cancelLongPress(){
+    clearTimeout(longPressTimer);
+    $("logoLongPress").classList.remove("holding");
+  }
+  const logoEl = $("logoLongPress");
+  logoEl.addEventListener("pointerdown", startLongPress);
+  logoEl.addEventListener("pointerup", cancelLongPress);
+  logoEl.addEventListener("pointerleave", cancelLongPress);
+  logoEl.addEventListener("pointercancel", cancelLongPress);
+  logoEl.addEventListener("contextmenu", (e)=>e.preventDefault());
   $("closeAdminAuth").onclick = ()=>closeSheet("adminAuthSheet");
 
   $("adminAuthSubmit").onclick = async ()=>{
