@@ -1,1949 +1,639 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🍹 ChillSip - Cold Drink Order</title>
-
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- QRCode.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ရှမ်းရိုးရာ မြန်မာစားသောက်ဆိုင်</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Padauk for Myanmar Text) -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shanYellow: '#FCD116',
+                        shanGreen: '#006A4E',
+                        shanRed: '#D21034',
+                        shanBg: '#FAF7F2',
+                        shanBorder: '#E2D7C5'
+                    },
+                    fontFamily: {
+                        padauk: ['Padauk', 'sans-serif']
+                    }
+                }
+            }
+        }
     </script>
-
     <style>
-        /* ---------- RESET & BASE ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f8;
-            color: #1e293b;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            font-family: 'Padauk', sans-serif;
+            background-color: #FAF7F2;
         }
-
-        .app {
-            max-width: 1200px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            position: relative;
+        .shan-pattern {
+            background-color: #006A4E;
+            background-image: radial-gradient(#FCD116 1px, transparent 1px), radial-gradient(#D21034 1px, #006A4E 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.95;
         }
-
-        /* ---------- HEADER ---------- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #fff;
-            border-bottom: 3px solid #38bdf8;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-left h1 {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .header-left h1 span {
-            color: #38bdf8;
-        }
-
-        .header-left i {
-            font-size: 28px;
-            color: #38bdf8;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .header-right .admin-btn,
-        .header-right .track-btn,
-        .header-right .telegram-link {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.10);
-            padding: 6px 14px 6px 10px;
-            border-radius: 30px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.25s;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .header-right .admin-btn:hover,
-        .header-right .track-btn:hover,
-        .header-right .telegram-link:hover {
-            background: rgba(255, 255, 255, 0.20);
-        }
-
-        .header-right .admin-btn i,
-        .header-right .track-btn i,
-        .header-right .telegram-link i {
-            color: #38bdf8;
-            font-size: 16px;
-        }
-
-        .cart-btn {
-            position: relative;
-            background: rgba(255, 255, 255, 0.10);
-            border: none;
-            color: #fff;
-            width: 48px;
-            height: 48px;
+        .shan-sun {
+            width: 50px;
+            height: 50px;
+            background-color: white;
             border-radius: 50%;
-            font-size: 22px;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cart-btn:hover {
-            background: rgba(255, 255, 255, 0.20);
-        }
-
-        .cart-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #1e293b;
-        }
-
-        .header-status {
-            font-size: 14px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #22c55e;
             display: inline-block;
-            animation: pulse-dot 1.8s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
-        }
-
-        /* ---------- MAIN LAYOUT ---------- */
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 24px 30px 30px;
-            gap: 30px;
-        }
-
-        .menu-section {
-            flex: 2;
-            min-width: 280px;
-        }
-
-        .cart-section {
-            flex: 1;
-            min-width: 280px;
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            max-height: 600px;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #e2e8f0;
-            position: sticky;
-            top: 20px;
-        }
-
-        /* ---------- MENU ---------- */
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .menu-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .menu-header h2 i {
-            color: #38bdf8;
-            margin-right: 8px;
-        }
-
-        .menu-header .filter-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .filter-tabs button {
-            background: #f1f5f9;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-            cursor: pointer;
-            transition: 0.25s;
-        }
-
-        .filter-tabs button:hover {
-            background: #e2e8f0;
-        }
-
-        .filter-tabs button.active {
-            background: #0f172a;
-            color: #fff;
-        }
-
-        /* Drink Grid */
-        .drink-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 18px;
-        }
-
-        .drink-card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 18px 14px 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid #eef2f6;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .drink-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-            border-color: #b9d4f0;
-        }
-
-        .drink-card .drink-icon {
-            font-size: 44px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .drink-card .drink-name {
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 2px;
-        }
-
-        .drink-card .drink-desc {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-
-        .drink-card .drink-price {
-            font-weight: 700;
-            color: #0f172a;
-            font-size: 18px;
-        }
-
-        .drink-card .drink-price small {
-            font-size: 13px;
-            font-weight: 400;
-            color: #64748b;
-        }
-
-        .drink-card .add-btn {
-            margin-top: 10px;
-            background: #0f172a;
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            padding: 6px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .drink-card .add-btn:hover {
-            background: #1e293b;
-        }
-
-        .drink-card .add-btn i {
-            font-size: 12px;
-        }
-
-        .drink-card .badge-popular {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #f59e0b;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 30px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ---------- CART SECTION ---------- */
-        .cart-section h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .cart-section h3 i {
-            color: #38bdf8;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin-bottom: 14px;
-        }
-
-        .cart-items::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .cart-items::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .cart-item-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-item-info .ci-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .cart-item-info .ci-detail {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .cart-item-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cart-item-actions .qty-btn {
-            background: #f1f5f9;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cart-item-actions .qty-btn:hover {
-            background: #e2e8f0;
-        }
-
-        .cart-item-actions .qty-num {
-            font-weight: 600;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .cart-item-actions .item-price {
-            font-weight: 700;
-            font-size: 14px;
-            min-width: 50px;
-            text-align: right;
-        }
-
-        .cart-empty {
-            text-align: center;
-            color: #94a3b8;
-            padding: 40px 0;
-            font-size: 14px;
-        }
-
-        .cart-empty i {
-            font-size: 40px;
-            color: #cbd5e1;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        /* Cart Footer */
-        .cart-footer {
-            border-top: 2px solid #e2e8f0;
-            padding-top: 14px;
-        }
-
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        .cart-total span:last-child {
-            color: #0f172a;
-        }
-
-        .payment-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .payment-options button {
-            flex: 1;
-            min-width: 80px;
-            padding: 10px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            background: #fff;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .payment-options button:hover {
-            border-color: #94a3b8;
-        }
-
-        .payment-options button.pay-cash {
-            border-color: #22c55e;
-            background: #f0fdf4;
-            color: #16a34a;
-        }
-
-        .payment-options button.pay-cash:hover {
-            background: #dcfce7;
-        }
-
-        .payment-options button.pay-qr {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .payment-options button.pay-qr:hover {
-            background: #dbeafe;
-        }
-
-        .payment-options button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ---------- MODAL (generic) ---------- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .modal {
-            background: #fff;
-            border-radius: 28px;
-            max-width: 700px;
-            width: 100%;
-            padding: 32px 30px 30px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-            position: relative;
-            max-height: 95vh;
-            overflow-y: auto;
-        }
-
-        .modal .close-modal {
-            position: absolute;
-            top: 14px;
-            right: 18px;
-            background: none;
-            border: none;
-            font-size: 26px;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .modal .close-modal:hover {
-            color: #1e293b;
-            transform: rotate(90deg);
-        }
-
-        .modal h2 {
-            font-size: 24px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal h2 i {
-            color: #38bdf8;
-        }
-
-        .modal .subtitle {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        /* ---------- ADMIN LOGIN ---------- */
-        .admin-login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 10px;
-        }
-
-        .admin-login-form input {
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            font-size: 16px;
-            outline: none;
-            transition: border 0.2s;
-        }
-
-        .admin-login-form input:focus {
-            border-color: #38bdf8;
-        }
-
-        .admin-login-form button {
-            padding: 14px;
-            background: #0f172a;
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .admin-login-form button:hover {
-            background: #1e293b;
-        }
-
-        .admin-login-error {
-            color: #ef4444;
-            font-weight: 600;
-            text-align: center;
-            margin-top: 4px;
-        }
-
-        /* ---------- ADMIN PANEL ---------- */
-        .admin-panel-actions {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-        }
-
-        .admin-panel-actions button {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .admin-panel-actions button:hover {
-            background: #e2e8f0;
-        }
-
-        .admin-panel-actions button.refresh-btn {
-            background: #0f172a;
-            color: #fff;
-        }
-
-        .admin-panel-actions button.refresh-btn:hover {
-            background: #1e293b;
-        }
-
-        .admin-order-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .admin-order-table th {
-            text-align: left;
-            background: #f1f5f9;
-            padding: 10px 12px;
-            font-weight: 700;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .admin-order-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #eef2f6;
-            vertical-align: middle;
-        }
-
-        .admin-order-table .order-token {
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            background: #f1f5f9;
-            padding: 2px 10px;
-            border-radius: 30px;
-            font-size: 13px;
-        }
-
-        .admin-order-table .status-badge {
-            display: inline-block;
-            padding: 2px 14px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .status-badge.completed {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        .status-badge.confirmed {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .admin-order-table select.status-select {
-            padding: 4px 8px;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            font-weight: 600;
-            font-size: 12px;
-            background: #fff;
-            cursor: pointer;
-        }
-
-        .admin-order-table .order-items-cell {
-            max-width: 180px;
-            font-size: 13px;
-        }
-
-        .admin-order-table .order-items-cell span {
-            display: block;
-        }
-
-        .no-orders-msg {
-            text-align: center;
-            color: #94a3b8;
-            padding: 40px 0;
-        }
-
-        /* ---------- PAYMENT MODAL (QR etc) ---------- */
-        .order-summary {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px 18px;
-            margin-bottom: 22px;
-        }
-
-        .order-summary .os-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            padding: 4px 0;
-        }
-
-        .order-summary .os-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 18px;
-            padding-top: 10px;
-            border-top: 2px solid #e2e8f0;
-            margin-top: 8px;
-        }
-
-        .qr-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 18px 0 22px;
-        }
-
-        .qr-container #qrcode {
-            background: #fff;
-            padding: 12px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            border: 2px solid #eef2f6;
-        }
-
-        .qr-container .qr-label {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 10px;
-        }
-
-        .qr-container .qr-label strong {
-            color: #0f172a;
-        }
-
-        .payment-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .payment-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .payment-actions .btn-confirm {
-            background: #0f172a;
-            color: #fff;
-        }
-
-        .payment-actions .btn-confirm:hover {
-            background: #1e293b;
-        }
-
-        .payment-actions .btn-cancel {
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .payment-actions .btn-cancel:hover {
-            background: #e2e8f0;
-        }
-
-        /* ---------- TRACK ORDER ---------- */
-        .track-input-group {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .track-input-group input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            outline: none;
-            transition: border 0.2s;
-            min-width: 120px;
-        }
-
-        .track-input-group input:focus {
-            border-color: #38bdf8;
-        }
-
-        .track-input-group button {
-            padding: 12px 24px;
-            background: #0f172a;
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .track-input-group button:hover {
-            background: #1e293b;
-        }
-
-        .track-result .not-found {
-            text-align: center;
-            color: #ef4444;
-            font-weight: 600;
-            padding: 20px 0;
-        }
-
-        .track-result .order-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px 18px;
-        }
-
-        .track-result .order-card .order-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .track-result .order-card .order-meta strong {
-            color: #0f172a;
-        }
-
-        .track-result .order-card .order-items .oi-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            font-size: 14px;
-        }
-
-        .track-result .order-card .order-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 17px;
-            padding-top: 10px;
-            border-top: 2px solid #e2e8f0;
-            margin-top: 8px;
-        }
-
-        .track-result .order-card .order-status {
-            display: inline-block;
-            background: #22c55e;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 2px 14px;
-            border-radius: 30px;
-            margin-top: 8px;
-        }
-
-        /* ---------- TOAST ---------- */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #0f172a;
-            color: #fff;
-            padding: 14px 30px;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 15px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            pointer-events: none;
-            max-width: 90vw;
-            text-align: center;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-            pointer-events: auto;
-        }
-
-        .toast i {
-            font-size: 20px;
-            color: #22c55e;
-        }
-
-        .toast a {
-            color: #38bdf8;
-            text-decoration: underline;
-            font-weight: 700;
-            pointer-events: auto;
-        }
-
-        .toast .token-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 2px 14px;
-            border-radius: 30px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            font-size: 16px;
-            color: #38bdf8;
-        }
-
-        /* ---------- RESPONSIVE ---------- */
-        @media (max-width: 780px) {
-            .header {
-                padding: 16px 18px;
-            }
-
-            .header-left h1 {
-                font-size: 20px;
-            }
-
-            .header-right .admin-btn span,
-            .header-right .track-btn span,
-            .header-right .telegram-link span {
-                display: none;
-            }
-            .header-right .admin-btn,
-            .header-right .track-btn,
-            .header-right .telegram-link {
-                padding: 6px 10px;
-            }
-
-            .main-content {
-                padding: 16px;
-                flex-direction: column;
-            }
-
-            .cart-section {
-                max-height: none;
-                position: static;
-            }
-
-            .drink-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-
-            .modal {
-                padding: 24px 18px;
-                margin: 10px;
-                max-width: 100%;
-            }
-
-            .admin-order-table {
-                font-size: 12px;
-            }
-            .admin-order-table th,
-            .admin-order-table td {
-                padding: 6px 8px;
-            }
-        }
-
-        @media (max-width: 430px) {
-            .drink-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .drink-card {
-                padding: 14px 8px 12px;
-            }
-
-            .drink-card .drink-icon {
-                font-size: 34px;
-            }
-
-            .header-left h1 {
-                font-size: 17px;
-            }
-
-            .payment-options button {
-                font-size: 12px;
-                padding: 8px 4px;
-            }
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
-<body>
+<body class="text-gray-800 pb-24">
 
-    <!-- ========== APP ========== -->
-    <div class="app" id="app">
-
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <i class="fas fa-mug-saucer"></i>
-                <h1>Chill<span>Sip</span></h1>
+    <!-- Header / Banner -->
+    <header class="shan-pattern text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="shan-sun flex items-center justify-center text-shanGreen font-bold text-xl shadow-inner">
+                    <i class="fa-solid font-bold text-amber-600">🍜</i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-shanYellow tracking-wide">တိုင်လွိုင် ရှမ်းရိုးရာ စားသောက်ဆိုင်</h1>
+                    <p class="text-xs text-gray-200">ရှမ်းပြည်နယ်ရဲ့ စစ်မှန်သော အရသာ ရိုးရာအစားအစာများ</p>
+                </div>
             </div>
-            <div class="header-right">
-                <span class="header-status">
-                    <span class="dot"></span> Open
-                </span>
-                <!-- Admin Button -->
-                <button class="admin-btn" id="adminBtn">
-                    <i class="fas fa-lock"></i>
-                    <span>Admin</span>
-                </button>
-                <!-- Track Order Button -->
-                <button class="track-btn" id="trackOrderBtn">
-                    <i class="fas fa-search"></i>
-                    <span>Track</span>
-                </button>
-                <!-- Telegram link -->
-                <a href="https://t.me/your_channel" target="_blank" class="telegram-link" id="telegramLink">
-                    <i class="fab fa-telegram-plane"></i>
-                    <span>Join</span>
-                </a>
-                <button class="cart-btn" id="cartToggle" aria-label="Open cart">
-                    <i class="fas fa-cart-shopping"></i>
-                    <span class="cart-badge" id="cartBadge">0</span>
-                </button>
+            
+            <!-- Admin Settings Button -->
+            <button onclick="openAdminAuthModal()" class="bg-shanYellow text-gray-900 p-2.5 rounded-full hover:bg-yellow-400 transition shadow-md flex items-center justify-center space-x-1" title="Admin Control Panel">
+                <i class="fa-solid fa-user-shield text-lg"></i>
+            </button>
+        </div>
+        <!-- Shan Flag Stripe Bar -->
+        <div class="h-2 w-full flex">
+            <div class="w-1/3 bg-shanYellow"></div>
+            <div class="w-1/3 bg-shanGreen"></div>
+            <div class="w-1/3 bg-shanRed"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6">
+
+        <!-- Banner Announcement -->
+        <div class="bg-amber-100 border-l-4 border-amber-600 p-4 rounded-r-lg mb-6 shadow-sm flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-bullhorn text-amber-700 text-xl"></i>
+                <span class="text-amber-900 text-sm font-semibold">မင်္ဂလာပါ... ရှမ်းရိုးရာ အစားအစာများကို အလွယ်တကူ မှာယူနိုင်ပါသည်။</span>
             </div>
-        </header>
+        </div>
 
-        <!-- MAIN -->
-        <div class="main-content">
+        <!-- Menu Categories Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-shanGreen border-b-2 border-shanYellow pb-2 mb-4 flex items-center">
+                <i class="fa-solid fa-utensils mr-2 text-shanRed"></i> စားသောက်ဖွယ်ရာ မီနူးများ (Menu)
+            </h2>
 
-            <!-- MENU -->
-            <section class="menu-section">
-                <div class="menu-header">
-                    <h2><i class="fas fa-glass-water"></i> Cold Drinks</h2>
-                    <div class="filter-tabs">
-                        <button class="active" data-filter="all">All</button>
-                        <button data-filter="coffee">Coffee</button>
-                        <button data-filter="tea">Tea</button>
-                        <button data-filter="fruity">Fruity</button>
-                        <button data-filter="special">Special</button>
-                    </div>
+            <!-- Menu Cards Grid -->
+            <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Javascript will dynamically inject items here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Cart Bar (Bottom) -->
+    <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-shanYellow shadow-2xl p-4 z-40 hidden">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <i class="fa-solid fa-basket-shopping text-3xl text-shanGreen"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-shanRed text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </div>
-
-                <div class="drink-grid" id="drinkGrid">
-                    <!-- drinks injected by JS -->
+                <div>
+                    <div class="text-xs text-gray-500">စုစုပေါင်း ကျသင့်ငွေ</div>
+                    <div id="cart-total" class="text-lg font-bold text-shanRed">0 ကျပ်</div>
                 </div>
-            </section>
-
-            <!-- CART -->
-            <aside class="cart-section" id="cartSection">
-                <h3><i class="fas fa-cart-shopping"></i> Your Order</h3>
-                <div class="cart-items" id="cartItems">
-                    <div class="cart-empty">
-                        <i class="fas fa-mug-empty"></i>
-                        No drinks yet<br /><span style="font-size:13px;">Tap a drink to add</span>
-                    </div>
-                </div>
-                <div class="cart-footer">
-                    <div class="cart-total">
-                        <span>Total</span>
-                        <span id="cartTotal">$0.00</span>
-                    </div>
-                    <div class="payment-options">
-                        <button class="pay-cash" id="payCashBtn" disabled>
-                            <i class="fas fa-money-bill-wave"></i> Cash
-                        </button>
-                        <button class="pay-qr" id="payQrBtn" disabled>
-                            <i class="fas fa-qrcode"></i> QR Pay
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
+            </div>
+            <button onclick="openOrderModal()" class="bg-shanGreen hover:bg-emerald-800 text-white font-bold py-2.5 px-6 rounded-lg shadow-md transition flex items-center space-x-2">
+                <span>အော်ဒါကြည့်ရန်</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
     </div>
 
-    <!-- ========== PAYMENT MODAL ========== -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="close-modal" id="closeModal">&times;</button>
-
-            <h2 id="modalTitle"><i class="fas fa-qrcode"></i> Payment</h2>
-            <p class="subtitle" id="modalSubtitle">Review your order and complete payment.</p>
-
-            <div class="order-summary" id="orderSummary">
-                <!-- populated by JS -->
-            </div>
-
-            <div class="qr-container" id="qrContainer" style="display:none;">
-                <div id="qrcode"></div>
-                <p class="qr-label">
-                    <i class="fas fa-phone"></i> Scan with your banking app<br />
-                    <strong>ChillSip • Order #<span id="qrOrderId">0000</span></strong>
-                </p>
-            </div>
-
-            <div class="payment-actions">
-                <button class="btn-confirm" id="confirmPayment">
-                    <i class="fas fa-check"></i> Confirm Payment
+    <!-- Order Modal -->
+    <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden border-2 border-shanYellow">
+            
+            <!-- Modal Header -->
+            <div class="bg-shanGreen text-white p-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold flex items-center">
+                    <i class="fa-solid fa-receipt mr-2 text-shanYellow"></i> အော်ဒါအတည်ပြုခြင်း
+                </h3>
+                <button onclick="closeOrderModal()" class="text-gray-300 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
-                <button class="btn-cancel" id="cancelPayment">Cancel</button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-4 overflow-y-auto flex-1 space-y-4">
+                
+                <!-- Selected Items List -->
+                <div>
+                    <h4 class="font-bold text-gray-700 text-sm border-b pb-1 mb-2">မှာယူထားသော ဟင်းပွဲများ</h4>
+                    <div id="order-items-list" class="space-y-2 text-sm divide-y">
+                        <!-- Dynamic Cart List -->
+                    </div>
+                </div>
+
+                <!-- Total Summary -->
+                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 flex justify-between items-center font-bold">
+                    <span>စုစုပေါင်း ကျသင့်ငွေ:</span>
+                    <span id="modal-total-price" class="text-shanRed text-lg">0 ကျပ်</span>
+                </div>
+
+                <!-- Customer Info Form -->
+                <form id="order-form" class="space-y-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">
+                            Telegram @username <span class="text-red-500">* (မဖြစ်မနေ ထည့်ရန်)</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">@</span>
+                            <input type="text" id="cust-telegram" required placeholder="username" class="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">နာမည်</label>
+                            <input type="text" id="cust-name" placeholder="မောင်မောင်" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">ဖုန်းနံပါတ်</label>
+                            <input type="tel" id="cust-phone" placeholder="09xxxxxxxxx" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">စားသောက်မည့် ပုံစံ</label>
+                        <select id="dining-option" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen bg-white">
+                            <option value="ဆိုင်စား">ဆိုင်စားမည်</option>
+                            <option value="ပါဆယ်">ပါဆယ်ယူမည်</option>
+                        </select>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">ငွေပေးချေမှု စနစ် <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="border rounded-lg p-3 flex items-center space-x-2 cursor-pointer hover:bg-amber-50">
+                                <input type="radio" name="payment" value="ငွေသား" checked onchange="togglePaymentUI()" class="text-shanGreen">
+                                <span class="text-sm font-semibold">💵 ငွေသား</span>
+                            </label>
+                            <label class="border rounded-lg p-3 flex items-center space-x-2 cursor-pointer hover:bg-amber-50">
+                                <input type="radio" name="payment" value="KBZ Pay QR" onchange="togglePaymentUI()" class="text-shanGreen">
+                                <span class="text-sm font-semibold">📱 KBZ Pay QR</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- KBZ Pay QR Display Area -->
+                    <div id="kbz-pay-area" class="hidden bg-blue-50 border border-blue-200 p-3 rounded-lg text-center">
+                        <p class="text-xs font-bold text-blue-900 mb-2">KBZ Pay QR ဖြင့် ငွေလွှဲရန် scan ဖတ်ပါ</p>
+                        <!-- Generated SVG QR Placeholder for KBZ Pay -->
+                        <div class="bg-white p-2 inline-block rounded shadow-sm border border-blue-100">
+                            <svg class="w-36 h-36 mx-auto" viewBox="0 0 100 100">
+                                <rect width="100" height="100" fill="#ffffff"/>
+                                <rect x="10" y="10" width="25" height="25" fill="#003399"/>
+                                <rect x="15" y="15" width="15" height="15" fill="#ffffff"/>
+                                <rect x="18" y="18" width="9" height="9" fill="#003399"/>
+                                <rect x="65" y="10" width="25" height="25" fill="#003399"/>
+                                <rect x="70" y="15" width="15" height="15" fill="#ffffff"/>
+                                <rect x="73" y="18" width="9" height="9" fill="#003399"/>
+                                <rect x="10" y="65" width="25" height="25" fill="#003399"/>
+                                <rect x="15" y="70" width="15" height="15" fill="#ffffff"/>
+                                <rect x="18" y="73" width="9" height="9" fill="#003399"/>
+                                <rect x="40" y="15" width="10" height="10" fill="#003399"/>
+                                <rect x="45" y="35" width="15" height="15" fill="#003399"/>
+                                <rect x="65" y="55" width="20" height="10" fill="#003399"/>
+                                <rect x="40" y="70" width="15" height="20" fill="#003399"/>
+                                <rect x="70" y="75" width="15" height="15" fill="#003399"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">KPay Phone: <span class="font-bold text-blue-800">09-123456789</span></p>
+                        <p class="text-xs text-gray-500">Name: Shan Yoma Restaurant</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">မှတ်ချက် (ဆီလျှော့/အစပ်ကဲ စသည်ဖြင့်)</label>
+                        <textarea id="cust-note" rows="2" placeholder="အပိုဆောင်းမှာယူလိုသည်များ..." class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-gray-50 border-t flex space-x-2">
+                <button onclick="closeOrderModal()" class="w-1/3 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2.5 rounded-lg font-bold transition text-sm">
+                    မလုပ်တော့ပါ
+                </button>
+                <button onclick="submitOrder()" class="w-2/3 bg-shanRed hover:bg-red-700 text-white py-2.5 rounded-lg font-bold transition shadow-md flex items-center justify-center space-x-2 text-sm">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>အော်ဒါအတည်ပြုမည်</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ========== TRACK ORDER MODAL ========== -->
-    <div class="modal-overlay" id="trackModalOverlay">
-        <div class="modal">
-            <button class="close-modal" id="closeTrackModal">&times;</button>
-
-            <h2><i class="fas fa-search"></i> Track Order</h2>
-            <p class="subtitle">Enter your 6-digit order token to view details.</p>
-
-            <div class="track-input-group">
-                <input type="text" id="trackTokenInput" placeholder="e.g. A7F3K2" maxlength="6" autocomplete="off" />
-                <button id="trackLookupBtn"><i class="fas fa-arrow-right"></i> View</button>
+    <!-- Admin Authentication Password Modal -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-5 border-2 border-shanYellow">
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-shanYellow rounded-full flex items-center justify-center mx-auto mb-2 text-xl text-gray-800">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Admin Login</h3>
+                <p class="text-xs text-gray-500">Admin Panel သို့ဝင်ရောက်ရန် Password ရိုက်ထည့်ပါ</p>
+                <p class="text-[10px] text-amber-600 mt-1">(Default Password: <b>1234</b>)</p>
             </div>
-
-            <div class="track-result" id="trackResult">
-                <!-- result will be injected here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== ADMIN LOGIN MODAL ========== -->
-    <div class="modal-overlay" id="adminLoginModal">
-        <div class="modal" style="max-width: 420px;">
-            <button class="close-modal" id="closeAdminLogin">&times;</button>
-            <h2><i class="fas fa-lock"></i> Admin Login</h2>
-            <p class="subtitle">Enter the admin password to manage orders.</p>
-            <form class="admin-login-form" id="adminLoginForm" autocomplete="off">
-                <input type="password" id="adminPasswordInput" placeholder="Enter password" />
-                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
-                <div id="adminLoginError" class="admin-login-error" style="display:none;">❌ Incorrect password</div>
+            
+            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="admin-pass-input" placeholder="Password ရိုက်ထည့်ပါ" class="w-full p-2.5 border rounded-lg text-sm text-center focus:outline-none focus:border-shanGreen" required>
+                    <p id="admin-pass-error" class="text-xs text-red-500 mt-1 hidden text-center">Password မှားယွင်းနေပါသည်။</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 bg-gray-300 text-gray-800 py-2 rounded-lg text-xs font-bold">မလုပ်တော့ပါ</button>
+                    <button type="submit" class="w-1/2 bg-shanGreen text-white py-2 rounded-lg text-xs font-bold hover:bg-emerald-800">ဝင်မည်</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- ========== ADMIN PANEL MODAL ========== -->
-    <div class="modal-overlay" id="adminPanelModal">
-        <div class="modal" style="max-width: 900px;">
-            <button class="close-modal" id="closeAdminPanel">&times;</button>
-            <h2><i class="fas fa-user-cog"></i> Admin Panel</h2>
-            <p class="subtitle">All orders overview. You can update statuses.</p>
-
-            <div class="admin-panel-actions">
-                <button class="refresh-btn" id="adminRefreshBtn"><i class="fas fa-sync"></i> Refresh</button>
-                <button id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <!-- Telegram Bot & Admin Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 border-2 border-shanYellow max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-3 border-b pb-2">
+                <h3 class="text-lg font-bold text-shanGreen flex items-center">
+                    <i class="fa-solid fa-robot mr-2"></i> Admin Panel (Telegram Settings)
+                </h3>
+                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <div id="adminOrderList">
-                <!-- orders injected here -->
+            <!-- Telegram Bot Config -->
+            <div class="space-y-3 mb-6">
+                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Telegram Bot ချိတ်ဆက်မှု</h4>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Bot Token</label>
+                    <input type="text" id="bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQ..." class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Admin Chat ID</label>
+                    <input type="text" id="chat-id" placeholder="e.g. 987654321" class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
+                </div>
+            </div>
+
+            <!-- Change Admin Password Section -->
+            <div class="space-y-3 border-t pt-4">
+                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Admin Password ပြောင်းလဲရန်</h4>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Password အသစ်</label>
+                    <input type="password" id="new-admin-pass" placeholder="Password အသစ်ရိုက်ပါ" class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-2 border-t pt-3">
+                <button onclick="toggleSettingsModal()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-xs font-bold">ပိတ်မည်</button>
+                <button onclick="saveBotSettings()" class="bg-shanGreen text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-800">သိမ်းဆည်းမည်</button>
             </div>
         </div>
     </div>
 
-    <!-- ========== TOAST ========== -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMessage">Order placed!</span>
-    </div>
-
-
-    <!-- ========== JAVASCRIPT ========== -->
+    <!-- JavaScript Application Logic -->
     <script>
-        (function() {
-            'use strict';
+        // Menu Items Data
+        const menuData = [
+            {
+                id: 'tofu-noodle',
+                name: 'တိုဖူးခေါက်ဆွဲ',
+                icon: '🍜',
+                price: 3500,
+                options: ['ကြက်သား', 'ဝက်သား']
+            },
+            {
+                id: 'shan-noodle',
+                name: 'ရှမ်းခေါက်ဆွဲ',
+                icon: '🥣',
+                price: 3500,
+                options: ['ကြက်သား', 'ဝက်သား']
+            },
+            {
+                id: 'ye-seim-noodle',
+                name: 'ရေစိမ်ခေါက်ဆွဲ',
+                icon: '🍲',
+                price: 3500,
+                options: ['ကြက်သား', 'ဝက်သား']
+            },
+            {
+                id: 'mala-hin',
+                name: 'မာလာဟင်း',
+                icon: '🥘',
+                price: 6000,
+                options: ['ကြက်သား', 'ဝက်သား']
+            },
+            {
+                id: 'mala-xiang-guo',
+                name: 'မာလာရှမ်းကော',
+                icon: '🍱',
+                price: 8000,
+                options: ['ကြက်သား', 'ဝက်သား', 'ပင်လယ်စာ']
+            },
+            {
+                id: 'drinks',
+                name: 'အချိုရည်အမျိုးမျိုး',
+                icon: '🥤',
+                price: 1500,
+                options: ['Coca Cola', 'Sprite', 'Green Tea', 'သံပုရာရည်']
+            }
+        ];
 
-            // ============================================================
-            // 🔐 ADMIN CONFIGURATION
-            // ============================================================
-            const ADMIN_PASSWORD = 'admin123'; // เปลี่ยนรหัสผ่านที่นี่
-            // ============================================================
-              <script>
-        // --- 1. 商家 Telegram 配置文件（此处配置，不向顾客展示） ---
-        const TELEGRAM_CONFIG = {
-            // 请在此处填写商家的 Bot Token 和 Chat ID
-            botToken: "8643030729:AAEgMw4EiNydJ9eUjjpkmWDKlqkorDAyFjw", 
-            chatId: "1949334561"
+        // Global State
+        let cart = [];
+        let botToken = localStorage.getItem('tg_bot_token') || '';
+        let chatId = localStorage.getItem('tg_chat_id') || '';
+        let adminPassword = localStorage.getItem('admin_pass') || '1234'; // Default Password: 1234
+
+        // Initialize App
+        window.onload = function() {
+            renderMenu();
+            document.getElementById('bot-token').value = botToken;
+            document.getElementById('chat-id').value = chatId;
         };
 
-            // ---------- DATA ----------
-            const drinks = [{
-                id: 1,
-                name: 'Iced Coffee',
-                icon: '☕',
-                desc: 'Smooth & bold',
-                price: 4.50,
-                category: 'coffee',
-                popular: true
-            }, {
-                id: 2,
-                name: 'Bubble Tea',
-                icon: '🧋',
-                desc: 'Tapioca pearls',
-                price: 5.25,
-                category: 'tea',
-                popular: true
-            }, {
-                id: 3,
-                name: 'Lemonade',
-                icon: '🍋',
-                desc: 'Fresh & tangy',
-                price: 3.75,
-                category: 'fruity',
-                popular: false
-            }, {
-                id: 4,
-                name: 'Iced Tea',
-                icon: '🍵',
-                desc: 'Peach flavor',
-                price: 3.50,
-                category: 'tea',
-                popular: false
-            }, {
-                id: 5,
-                name: 'Berry Smoothie',
-                icon: '🍓',
-                desc: 'Mixed berries',
-                price: 6.00,
-                category: 'fruity',
-                popular: true
-            }, {
-                id: 6,
-                name: 'Milkshake',
-                icon: '🥤',
-                desc: 'Vanilla bean',
-                price: 5.75,
-                category: 'special',
-                popular: false
-            }, {
-                id: 7,
-                name: 'Cold Brew',
-                icon: '🧊',
-                desc: 'Nitro infused',
-                price: 5.00,
-                category: 'coffee',
-                popular: false
-            }, {
-                id: 8,
-                name: 'Fruit Punch',
-                icon: '🍍',
-                desc: 'Tropical blend',
-                price: 4.25,
-                category: 'fruity',
-                popular: false
-            }, {
-                id: 9,
-                name: 'Matcha Latte',
-                icon: '🍵',
-                desc: 'Iced matcha',
-                price: 5.50,
-                category: 'tea',
-                popular: false
-            }, {
-                id: 10,
-                name: 'Soda Float',
-                icon: '🥤',
-                desc: 'Vanilla & cola',
-                price: 4.00,
-                category: 'special',
-                popular: false
-            }];
+        // Render Menu Cards
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
 
-            // ---------- STATE ----------
-            let cart = [];
-            let currentFilter = 'all';
-            let selectedPayment = null;
-            let orderIdCounter = Math.floor(1000 + Math.random() * 9000);
+            menuData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl border border-shanBorder shadow-sm hover:shadow-md transition flex flex-col justify-between";
+                
+                let optionsHTML = item.options.map((opt, idx) => `
+                    <label class="inline-flex items-center mr-3 mb-1 cursor-pointer text-xs">
+                        <input type="radio" name="meat-${item.id}" value="${opt}" ${idx === 0 ? 'checked' : ''} class="text-shanGreen focus:ring-shanGreen">
+                        <span class="ml-1 text-gray-700">${opt}</span>
+                    </label>
+                `).join('');
 
-            // ---------- DOM REFS ----------
-            const drinkGrid = document.getElementById('drinkGrid');
-            const cartItemsEl = document.getElementById('cartItems');
-            const cartTotalEl = document.getElementById('cartTotal');
-            const cartBadge = document.getElementById('cartBadge');
-            const payCashBtn = document.getElementById('payCashBtn');
-            const payQrBtn = document.getElementById('payQrBtn');
-            const modalOverlay = document.getElementById('modalOverlay');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalSubtitle = document.getElementById('modalSubtitle');
-            const orderSummary = document.getElementById('orderSummary');
-            const qrContainer = document.getElementById('qrContainer');
-            const qrOrderId = document.getElementById('qrOrderId');
-            const confirmBtn = document.getElementById('confirmPayment');
-            const cancelBtn = document.getElementById('cancelPayment');
-            const closeModalBtn = document.getElementById('closeModal');
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-
-            // Track modal
-            const trackModalOverlay = document.getElementById('trackModalOverlay');
-            const trackTokenInput = document.getElementById('trackTokenInput');
-            const trackLookupBtn = document.getElementById('trackLookupBtn');
-            const trackResult = document.getElementById('trackResult');
-            const closeTrackModalBtn = document.getElementById('closeTrackModal');
-
-            // Admin modals
-            const adminLoginModal = document.getElementById('adminLoginModal');
-            const adminLoginForm = document.getElementById('adminLoginForm');
-            const adminPasswordInput = document.getElementById('adminPasswordInput');
-            const adminLoginError = document.getElementById('adminLoginError');
-            const closeAdminLoginBtn = document.getElementById('closeAdminLogin');
-
-            const adminPanelModal = document.getElementById('adminPanelModal');
-            const closeAdminPanelBtn = document.getElementById('closeAdminPanel');
-            const adminRefreshBtn = document.getElementById('adminRefreshBtn');
-            const adminLogoutBtn = document.getElementById('adminLogoutBtn');
-            const adminOrderList = document.getElementById('adminOrderList');
-
-            const adminBtn = document.getElementById('adminBtn');
-
-            // ---------- STORAGE HELPERS ----------
-            function getStoredOrders() {
-                try {
-                    return JSON.parse(localStorage.getItem('chillsip_orders')) || [];
-                } catch {
-                    return [];
-                }
-            }
-
-            function saveOrders(orders) {
-                localStorage.setItem('chillsip_orders', JSON.stringify(orders));
-            }
-
-            function saveOrder(orderData) {
-                const orders = getStoredOrders();
-                // Ensure status field
-                if (!orderData.status) orderData.status = 'completed';
-                orders.push(orderData);
-                saveOrders(orders);
-            }
-
-            function findOrderByToken(token) {
-                const orders = getStoredOrders();
-                return orders.find(o => o.token === token.toUpperCase()) || null;
-            }
-
-            // ---------- TOKEN GENERATION ----------
-            function generateToken() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let token;
-                let attempts = 0;
-                const existing = getStoredOrders().map(o => o.token);
-                do {
-                    token = '';
-                    for (let i = 0; i < 6; i++) {
-                        token += chars.charAt(Math.floor(Math.random() * chars.length));
-                    }
-                    attempts++;
-                } while (existing.includes(token) && attempts < 100);
-                return token;
-            }
-
-            // ---------- RENDER MENU ----------
-            function renderMenu(filter = 'all') {
-                const filtered = filter === 'all' ?
-                    drinks :
-                    drinks.filter(d => d.category === filter);
-
-                drinkGrid.innerHTML = filtered.map(d => `
-                        <div class="drink-card" data-id="${d.id}">
-                            ${d.popular ? '<span class="badge-popular">🔥 Popular</span>' : ''}
-                            <span class="drink-icon">${d.icon}</span>
-                            <div class="drink-name">${d.name}</div>
-                            <div class="drink-desc">${d.desc}</div>
-                            <div class="drink-price">$${d.price.toFixed(2)} <small>each</small></div>
-                            <button class="add-btn" data-id="${d.id}">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
-                        </div>
-                    `).join('');
-
-                drinkGrid.querySelectorAll('.add-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(btn.dataset.id);
-                        addToCart(id);
-                    });
-                });
-
-                drinkGrid.querySelectorAll('.drink-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const id = parseInt(card.dataset.id);
-                        addToCart(id);
-                    });
-                });
-            }
-
-            // ---------- CART OPERATIONS ----------
-            function addToCart(drinkId) {
-                const drink = drinks.find(d => d.id === drinkId);
-                if (!drink) return;
-
-                const existing = cart.find(item => item.drinkId === drinkId);
-                if (existing) {
-                    existing.quantity += 1;
-                } else {
-                    cart.push({
-                        drinkId: drink.id,
-                        name: drink.name,
-                        price: drink.price,
-                        icon: drink.icon,
-                        quantity: 1
-                    });
-                }
-                updateCartUI();
-                showToast(`${drink.name} added to cart!`);
-            }
-
-            function removeFromCart(drinkId) {
-                const idx = cart.findIndex(item => item.drinkId === drinkId);
-                if (idx === -1) return;
-                if (cart[idx].quantity > 1) {
-                    cart[idx].quantity -= 1;
-                } else {
-                    cart.splice(idx, 1);
-                }
-                updateCartUI();
-            }
-
-            function getTotal() {
-                return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            }
-
-            function getItemCount() {
-                return cart.reduce((sum, item) => sum + item.quantity, 0);
-            }
-
-            function updateCartUI() {
-                const count = getItemCount();
-                const total = getTotal();
-
-                cartBadge.textContent = count;
-                cartTotalEl.textContent = `$${total.toFixed(2)}`;
-
-                const hasItems = count > 0;
-                payCashBtn.disabled = !hasItems;
-                payQrBtn.disabled = !hasItems;
-
-                if (cart.length === 0) {
-                    cartItemsEl.innerHTML = `
-                            <div class="cart-empty">
-                                <i class="fas fa-mug-empty"></i>
-                                No drinks yet<br /><span style="font-size:13px;">Tap a drink to add</span>
-                            </div>
-                        `;
-                    return;
-                }
-
-                cartItemsEl.innerHTML = cart.map(item => `
-                        <div class="cart-item" data-id="${item.drinkId}">
-                            <div class="cart-item-info">
-                                <span class="ci-name">${item.icon} ${item.name}</span>
-                                <span class="ci-detail">$${item.price.toFixed(2)} each</span>
-                            </div>
-                            <div class="cart-item-actions">
-                                <button class="qty-btn" data-action="decr" data-id="${item.drinkId}">−</button>
-                                <span class="qty-num">${item.quantity}</span>
-                                <button class="qty-btn" data-action="incr" data-id="${item.drinkId}">+</button>
-                                <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-4xl bg-amber-50 p-2 rounded-lg border border-amber-100">${item.icon}</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-base">${item.name}</h3>
+                                <p class="text-shanRed font-bold text-sm">${item.price.toLocaleString()} ကျပ်</p>
                             </div>
                         </div>
-                    `).join('');
-
-                cartItemsEl.querySelectorAll('.qty-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseInt(btn.dataset.id);
-                        const action = btn.dataset.action;
-                        if (action === 'incr') {
-                            const item = cart.find(i => i.drinkId === id);
-                            if (item) item.quantity += 1;
-                        } else {
-                            removeFromCart(id);
-                        }
-                        updateCartUI();
-                    });
-                });
-            }
-
-            // ---------- FILTER TABS ----------
-            document.querySelectorAll('.filter-tabs button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentFilter = btn.dataset.filter;
-                    renderMenu(currentFilter);
-                });
+                    </div>
+                    <div>
+                        <div class="my-2 bg-gray-50 p-2 rounded border border-gray-100">
+                            <span class="text-xs font-bold text-gray-500 block mb-1">အမျိုးအစား ရွေးရန်:</span>
+                            <div class="flex flex-wrap">${optionsHTML}</div>
+                        </div>
+                        <button onclick="addToCart('${item.id}')" class="w-full mt-2 bg-shanYellow hover:bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg shadow transition flex items-center justify-center space-x-1 text-sm">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>မှာယူမည်</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
             });
+        }
 
-            // ---------- ADMIN PANEL RENDER ----------
-            function renderAdminOrders() {
-                const orders = getStoredOrders();
-                if (orders.length === 0) {
-                    adminOrderList.innerHTML = `<div class="no-orders-msg">📭 No orders yet.</div>`;
-                    return;
-                }
+        // Add Item to Cart
+        function addToCart(itemId) {
+            const item = menuData.find(m => m.id === itemId);
+            const selectedMeat = document.querySelector(`input[name="meat-${itemId}"]:checked`).value;
+            
+            const cartItemId = `${itemId}-${selectedMeat}`;
+            const existing = cart.find(c => c.cartItemId === cartItemId);
 
-                let html = `
-                        <table class="admin-order-table">
-                            <thead>
-                                <tr>
-                                    <th>Token</th>
-                                    <th>Order #</th>
-                                    <th>Items</th>
-                                    <th>Total</th>
-                                    <th>Payment</th>
-                                    <th>Time</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                orders.forEach((order, index) => {
-                    const itemsText = order.items.map(i => `${i.icon} ${i.name} ×${i.quantity}`).join(', ');
-                    const status = order.status || 'completed';
-                    const statusClass = status === 'completed' ? 'completed' : status === 'pending' ? 'pending' :
-                        'confirmed';
-                    const statusOptions = ['pending', 'confirmed', 'completed'];
-
-                    html += `
-                            <tr>
-                                <td><span class="order-token">${order.token}</span></td>
-                                <td>#${order.orderId}</td>
-                                <td class="order-items-cell"><span>${itemsText}</span></td>
-                                <td>$${order.total.toFixed(2)}</td>
-                                <td>${order.paymentMethod}</td>
-                                <td style="font-size:12px;">${order.timestamp || 'N/A'}</td>
-                                <td>
-                                    <select class="status-select" data-index="${index}">
-                                        ${statusOptions.map(opt => `<option value="${opt}" ${opt === status ? 'selected' : ''}>${opt.charAt(0).toUpperCase() + opt.slice(1)}</option>`).join('')}
-                                    </select>
-                                </td>
-                            </tr>
-                        `;
-                });
-
-                html += `</tbody></table>`;
-                adminOrderList.innerHTML = html;
-
-                // Attach change event to status selects
-                adminOrderList.querySelectorAll('.status-select').forEach(select => {
-                    select.addEventListener('change', function() {
-                        const index = parseInt(this.dataset.index);
-                        const newStatus = this.value;
-                        const orders = getStoredOrders();
-                        if (orders[index]) {
-                            orders[index].status = newStatus;
-                            saveOrders(orders);
-                            showToast(`✅ Order #${orders[index].orderId} status updated to ${newStatus}`);
-                            // Optionally re-render to reflect changes (but we keep the select)
-                            // We can just update the class badge if we had, but we keep it simple.
-                            // We'll re-render after a moment to sync all.
-                            setTimeout(renderAdminOrders, 300);
-                        }
-                    });
-                });
-            }
-
-            // ---------- ADMIN LOGIN ----------
-            function handleAdminLogin(e) {
-                e.preventDefault();
-                const password = adminPasswordInput.value.trim();
-                if (password === ADMIN_PASSWORD) {
-                    adminLoginModal.classList.remove('active');
-                    adminPasswordInput.value = '';
-                    adminLoginError.style.display = 'none';
-                    // Open admin panel
-                    adminPanelModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                    renderAdminOrders();
-                } else {
-                    adminLoginError.style.display = 'block';
-                    adminPasswordInput.value = '';
-                    adminPasswordInput.focus();
-                }
-            }
-
-            function closeAdminLogin() {
-                adminLoginModal.classList.remove('active');
-                adminLoginError.style.display = 'none';
-                adminPasswordInput.value = '';
-                document.body.style.overflow = '';
-            }
-
-            function closeAdminPanel() {
-                adminPanelModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            function logoutAdmin() {
-                closeAdminPanel();
-                showToast('👋 Logged out from admin panel.');
-            }
-
-            // ---------- MODAL (payment) ----------
-            function openModal(method) {
-                if (cart.length === 0) return;
-                selectedPayment = method;
-
-                if (method === 'cash') {
-                    modalTitle.innerHTML = '<i class="fas fa-money-bill-wave"></i> Cash Payment';
-                    modalSubtitle.textContent = 'Pay at the counter with cash.';
-                    qrContainer.style.display = 'none';
-                } else {
-                    modalTitle.innerHTML = '<i class="fas fa-qrcode"></i> QR Payment';
-                    modalSubtitle.textContent = 'Scan the QR code with your banking app.';
-                    qrContainer.style.display = 'flex';
-                    const qrData = `ChillSip Order #${orderIdCounter} | Total: $${getTotal().toFixed(2)}`;
-                    setTimeout(() => {
-                        const qrEl = document.getElementById('qrcode');
-                        qrEl.innerHTML = '';
-                        new QRCode(qrEl, {
-                            text: qrData,
-                            width: 160,
-                            height: 160,
-                            colorDark: '#0f172a',
-                            colorLight: '#ffffff',
-                            correctLevel: QRCode.CorrectLevel.H,
-                        });
-                    }, 50);
-                    qrOrderId.textContent = orderIdCounter;
-                }
-
-                let html = '';
-                cart.forEach(item => {
-                    html += `
-                            <div class="os-item">
-                                <span>${item.icon} ${item.name} × ${item.quantity}</span>
-                                <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        `;
-                });
-                html += `
-                        <div class="os-total">
-                            <span>Total</span>
-                            <span>$${getTotal().toFixed(2)}</span>
-                        </div>
-                    `;
-                orderSummary.innerHTML = html;
-
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal() {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                selectedPayment = null;
-            }
-
-            // ---------- CONFIRM PAYMENT (with Token & Storage) ----------
-            async function confirmPayment() {
-                if (cart.length === 0) return;
-
-                const total = getTotal();
-                const method = selectedPayment === 'cash' ? 'Cash' : 'QR Pay';
-                const currentOrderId = orderIdCounter;
-
-                const token = generateToken();
-
-                const items = cart.map(item => ({
+            if(existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    cartItemId: cartItemId,
+                    id: item.id,
                     name: item.name,
-                    icon: item.icon,
-                    quantity: item.quantity,
-                    price: item.price
-                }));
-
-                const orderData = {
-                    token: token,
-                    orderId: currentOrderId,
-                    items: items,
-                    total: total,
-                    paymentMethod: method,
-                    timestamp: new Date().toLocaleString('th-TH'),
-                    status: 'pending' // default status
-                };
-                saveOrder(orderData);
-
-                closeModal();
-
-                const telegramUrl = 'https://t.me/your_channel';
-                const tokenHtml =
-                    `✅ Order #${currentOrderId} placed!<br/>🔑 Token: <span class="token-badge">${token}</span><br/><a href="${telegramUrl}" target="_blank">📲 View on Telegram</a>`;
-                showToast(tokenHtml, true);
-
-                cart = [];
-                updateCartUI();
-                orderIdCounter = Math.floor(1000 + Math.random() * 9000);
-                document.getElementById('qrcode').innerHTML = '';
-            }
-
-            // ---------- TRACK ORDER ----------
-            function handleTrackLookup() {
-                const token = trackTokenInput.value.trim().toUpperCase();
-                if (!token || token.length !== 6) {
-                    trackResult.innerHTML = `<div class="not-found">⚠️ Please enter a 6-digit token.</div>`;
-                    return;
-                }
-
-                const order = findOrderByToken(token);
-                if (!order) {
-                    trackResult.innerHTML = `
-                            <div class="not-found">
-                                <i class="fas fa-exclamation-circle"></i><br/>
-                                No order found with token <strong>${token}</strong>.
-                            </div>
-                        `;
-                    return;
-                }
-
-                let itemsHtml = '';
-                order.items.forEach(item => {
-                    itemsHtml += `
-                            <div class="oi-item">
-                                <span>${item.icon} ${item.name} × ${item.quantity}</span>
-                                <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        `;
+                    option: selectedMeat,
+                    price: item.price,
+                    qty: 1
                 });
-
-                const status = order.status || 'completed';
-                const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
-
-                trackResult.innerHTML = `
-                        <div class="order-card">
-                            <div class="order-meta">
-                                <span><strong>Order #${order.orderId}</strong></span>
-                                <span>${order.timestamp || 'N/A'}</span>
-                            </div>
-                            <div class="order-meta">
-                                <span>🔑 Token: <strong>${order.token}</strong></span>
-                                <span>💳 ${order.paymentMethod}</span>
-                            </div>
-                            <div class="order-items">
-                                ${itemsHtml}
-                            </div>
-                            <div class="order-total">
-                                <span>Total</span>
-                                <span>$${order.total.toFixed(2)}</span>
-                            </div>
-                            <div class="order-status">${statusLabel}</div>
-                        </div>
-                    `;
             }
 
-            // ---------- TOAST ----------
-            function showToast(msg, isHtml = false) {
-                if (isHtml) {
-                    toastMsg.innerHTML = msg;
-                } else {
-                    toastMsg.textContent = msg;
-                }
-                toast.classList.add('show');
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => {
-                    toast.classList.remove('show');
-                    if (isHtml) toastMsg.textContent = 'Order placed!';
-                }, 7000);
-            }
-
-            // ---------- EVENT LISTENERS ----------
-            document.getElementById('cartToggle').addEventListener('click', () => {
-                document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-
-            payCashBtn.addEventListener('click', () => openModal('cash'));
-            payQrBtn.addEventListener('click', () => openModal('qr'));
-
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            confirmBtn.addEventListener('click', confirmPayment);
-
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
-            });
-
-            // Track modal
-            document.getElementById('trackOrderBtn').addEventListener('click', () => {
-                trackResult.innerHTML = '';
-                trackTokenInput.value = '';
-                trackModalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                setTimeout(() => trackTokenInput.focus(), 300);
-            });
-
-            closeTrackModalBtn.addEventListener('click', () => {
-                trackModalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-
-            trackModalOverlay.addEventListener('click', (e) => {
-                if (e.target === trackModalOverlay) {
-                    trackModalOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-
-            trackLookupBtn.addEventListener('click', handleTrackLookup);
-            trackTokenInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleTrackLookup();
-                }
-                const start = trackTokenInput.selectionStart;
-                const end = trackTokenInput.selectionEnd;
-                trackTokenInput.value = trackTokenInput.value.toUpperCase();
-                trackTokenInput.setSelectionRange(start, end);
-            });
-            trackTokenInput.addEventListener('input', () => {
-                trackTokenInput.value = trackTokenInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-            });
-
-            // Admin login
-            adminBtn.addEventListener('click', () => {
-                adminLoginModal.classList.add('active');
-                adminPasswordInput.value = '';
-                adminLoginError.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-                setTimeout(() => adminPasswordInput.focus(), 300);
-            });
-
-            closeAdminLoginBtn.addEventListener('click', closeAdminLogin);
-            adminLoginForm.addEventListener('submit', handleAdminLogin);
-            adminLoginModal.addEventListener('click', (e) => {
-                if (e.target === adminLoginModal) closeAdminLogin();
-            });
-
-            // Admin panel
-            closeAdminPanelBtn.addEventListener('click', closeAdminPanel);
-            adminPanelModal.addEventListener('click', (e) => {
-                if (e.target === adminPanelModal) closeAdminPanel();
-            });
-            adminRefreshBtn.addEventListener('click', renderAdminOrders);
-            adminLogoutBtn.addEventListener('click', logoutAdmin);
-
-            // Global ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    if (modalOverlay.classList.contains('active')) closeModal();
-                    if (trackModalOverlay.classList.contains('active')) {
-                        trackModalOverlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    }
-                    if (adminLoginModal.classList.contains('active')) closeAdminLogin();
-                    if (adminPanelModal.classList.contains('active')) closeAdminPanel();
-                }
-            });
-
-            // ---------- INIT ----------
-            renderMenu('all');
             updateCartUI();
+        }
 
-            setTimeout(() => {
-                showToast('🍹 Welcome to ChillSip!');
-            }, 300);
+        // Update Floating Cart Bar
+        function updateCartUI() {
+            const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
-        })();
+            document.getElementById('cart-count').innerText = totalCount;
+            document.getElementById('cart-total').innerText = totalPrice.toLocaleString() + ' ကျပ်';
+
+            const cartBar = document.getElementById('cart-bar');
+            if (totalCount > 0) {
+                cartBar.classList.remove('hidden');
+            } else {
+                cartBar.classList.add('hidden');
+            }
+        }
+
+        // Open Order Confirmation Modal
+        function openOrderModal() {
+            if(cart.length === 0) return;
+
+            const listContainer = document.getElementById('order-items-list');
+            listContainer.innerHTML = '';
+
+            let total = 0;
+            cart.forEach((item, idx) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between py-2";
+                row.innerHTML = `
+                    <div>
+                        <div class="font-bold text-gray-800">${item.name} (${item.option})</div>
+                        <div class="text-xs text-gray-500">${item.price.toLocaleString()} x ${item.qty}</div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-gray-700">${subtotal.toLocaleString()} ကျပ်</span>
+                        <div class="flex items-center border rounded">
+                            <button onclick="changeQty(${idx}, -1)" class="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold">-</button>
+                            <span class="px-2 text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${idx}, 1)" class="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+
+            document.getElementById('modal-total-price').innerText = total.toLocaleString() + ' ကျပ်';
+            document.getElementById('order-modal').classList.remove('hidden');
+        }
+
+        // Change Quantity in Modal
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+            if(cart.length === 0) {
+                closeOrderModal();
+            } else {
+                openOrderModal();
+            }
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').classList.add('hidden');
+        }
+
+        // Toggle KBZ Pay UI
+        function togglePaymentUI() {
+            const payVal = document.querySelector('input[name="payment"]:checked').value;
+            const kbzArea = document.getElementById('kbz-pay-area');
+            if(payVal === 'KBZ Pay QR') {
+                kbzArea.classList.remove('hidden');
+            } else {
+                kbzArea.classList.add('hidden');
+            }
+        }
+
+        // Submit Order to Telegram Bot
+        async function submitOrder() {
+            const telegramInput = document.getElementById('cust-telegram').value.trim();
+            const nameInput = document.getElementById('cust-name').value.trim() || 'မသိရပါ';
+            const phoneInput = document.getElementById('cust-phone').value.trim() || 'မသိရပါ';
+            const diningOption = document.getElementById('dining-option').value;
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const noteInput = document.getElementById('cust-note').value.trim();
+
+            if(!telegramInput) {
+                alert('ကျေးဇူးပြု၍ Telegram @username ကို မဖြစ်မနေ ဖြည့်သွင်းပေးပါခင်ဗျာ။');
+                document.getElementById('cust-telegram').focus();
+                return;
+            }
+
+            const cleanTelegram = telegramInput.replace('@', '');
+            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+            // Construct Telegram Message
+            let msg = `🇲🇲 <b>[အော်ဒါအသစ် ရောက်ရှိပါပြီ]</b> 🇲🇲\n\n`;
+            msg += `👤 <b>ဝယ်ယူသူ:</b> ${nameInput}\n`;
+            msg += `📱 <b>Telegram:</b> @${cleanTelegram}\n`;
+            msg += `📞 <b>ဖုန်း:</b> ${phoneInput}\n`;
+            msg += `🍽️ <b>စားသောက်မည့်ပုံစံ:</b> ${diningOption}\n`;
+            msg += `💳 <b>ငွေပေးချေမှု:</b> ${paymentMethod}\n`;
+            if(noteInput) msg += `📝 <b>မှတ်ချက်:</b> ${noteInput}\n`;
+            msg += `\n🛒 <b>မှာယူထားသော စာရင်းများ:</b>\n`;
+            
+            cart.forEach((item, i) => {
+                msg += `${i+1}. ${item.name} (${item.option}) - ${item.qty} ပွဲ = ${(item.price * item.qty).toLocaleString()} ကျပ်\n`;
+            });
+
+            msg += `\n💰 <b>စုစုပေါင်း ကျသင့်ငွေ:</b> ${totalPrice.toLocaleString()} ကျပ်`;
+
+            // Telegram API Call
+            if(botToken && chatId) {
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: msg,
+                            parse_mode: 'HTML'
+                        })
+                    });
+                    const resData = await response.json();
+                    if(resData.ok) {
+                        alert('လူကြီးမင်း၏ အော်ဒါကို အောင်မြင်စွာ ပေးပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်!');
+                    } else {
+                        alert('Telegram သို့ အော်ဒါပို့ရာတွင် အမှားအယွင်းရှိနေပါသည်။ Bot Token နှင့် Chat ID အမှန်စစ်ဆေးပါ။');
+                    }
+                } catch(err) {
+                    alert('အော်ဒါ ပို့ဆောင်၍ မရပါခင်ဗျာ။ ကွန်ရက် အချိတ်အဆက်ကို စစ်ဆေးပါ။');
+                }
+            } else {
+                console.log("Telegram Order Details:\n", msg);
+                alert(`[Demo Mode] လူကြီးမင်း၏ အော်ဒါ အောင်မြင်ပါသည်။\n\n(Telegram Bot ဖြင့် ချိတ်ဆက်လိုပါက အပေါ်ဘက်ရှိ Settings ခလုတ်မှတစ်ဆင့် Admin ဝင်ရောက်ကာ Bot Token ထည့်သွင်းပါ)`);
+            }
+
+            // Reset Cart and Close Modal
+            cart = [];
+            updateCartUI();
+            closeOrderModal();
+            document.getElementById('order-form').reset();
+        }
+
+        // Admin Auth Modal Functions
+        function openAdminAuthModal() {
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('admin-pass-error').classList.add('hidden');
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('admin-pass-input').value;
+            if(inputPass === adminPassword) {
+                closeAdminAuthModal();
+                toggleSettingsModal();
+            } else {
+                document.getElementById('admin-pass-error').classList.remove('hidden');
+            }
+        }
+
+        // Settings Modal Functions
+        function toggleSettingsModal() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+        }
+
+        function saveBotSettings() {
+            botToken = document.getElementById('bot-token').value.trim();
+            chatId = document.getElementById('chat-id').value.trim();
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            
+            localStorage.setItem('tg_bot_token', botToken);
+            localStorage.setItem('tg_chat_id', chatId);
+
+            if(newPass) {
+                adminPassword = newPass;
+                localStorage.setItem('admin_pass', newPass);
+                document.getElementById('new-admin-pass').value = '';
+                alert('Telegram Bot မူလဆက်တင်များနှင့် Admin Password ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
+            } else {
+                alert('Telegram Bot မူလဆက်တင်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
+            }
+            
+            toggleSettingsModal();
+        }
     </script>
-
 </body>
 </html>
+```
