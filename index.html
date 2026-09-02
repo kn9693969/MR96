@@ -1,639 +1,1474 @@
-```html
 <!DOCTYPE html>
-<html lang="my">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ရှမ်းရိုးရာ မြန်မာစားသောက်ဆိုင်</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Padauk for Myanmar Text) -->
-    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        shanYellow: '#FCD116',
-                        shanGreen: '#006A4E',
-                        shanRed: '#D21034',
-                        shanBg: '#FAF7F2',
-                        shanBorder: '#E2D7C5'
-                    },
-                    fontFamily: {
-                        padauk: ['Padauk', 'sans-serif']
-                    }
-                }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>智能仓库管理系统</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ---------- 全局重置 & 变量 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --primary-bg: #eef2ff;
+            --success: #22c55e;
+            --success-bg: #dcfce7;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.2s ease;
+        }
+
+        body {
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* ---------- 布局容器 ---------- */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ---------- 顶部导航 ---------- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 28px;
+            border: 1px solid var(--gray-200);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .navbar-brand i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .navbar-brand span {
+            background: var(--primary-bg);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 4px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--gray-100);
+            border-radius: 30px;
+            padding: 0 16px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .search-box i {
+            color: var(--gray-400);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+            width: 200px;
+            color: var(--gray-800);
+        }
+
+        .search-box input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-600);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-400);
+        }
+
+        .btn-icon {
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ---------- 统计卡片 ---------- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .stat-info h4 {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .stat-info .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.blue {
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+
+        .stat-icon.green {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .stat-icon.yellow {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .stat-icon.red {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        /* ---------- 工具栏 ---------- */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group .btn {
+            background: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-600);
+            padding: 6px 16px;
+            font-weight: 500;
+        }
+
+        .filter-group .btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-group .btn:hover:not(.active) {
+            background: var(--gray-100);
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ---------- 表格 ---------- */
+        .table-wrapper {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        thead th {
+            text-align: left;
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray-500);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 14px 20px;
+            vertical-align: middle;
+            color: var(--gray-700);
+        }
+
+        .product-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-bg);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .product-name .name {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .product-name .sku {
+            font-size: 12px;
+            color: var(--gray-400);
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-instock {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-low {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .badge-out {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-category {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .action-btns .btn {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        /* ---------- 空状态 ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-400);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--gray-300);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        /* ---------- 模态框 ---------- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 520px;
+            width: 100%;
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.96) translateY(10px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            transition: var(--transition);
+            background: white;
+            color: var(--gray-800);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* ---------- Toast 通知 ---------- */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        .toast {
+            background: var(--gray-900);
+            color: white;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            animation: slideUp 0.35s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast i {
+            font-size: 18px;
+        }
+
+        .toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+
+        .toast .toast-close:hover {
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-    </script>
-    <style>
-        body {
-            font-family: 'Padauk', sans-serif;
-            background-color: #FAF7F2;
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .navbar {
+                padding: 14px 18px;
+            }
+
+            .navbar-brand {
+                font-size: 18px;
+            }
+
+            .search-box input {
+                width: 120px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-info .number {
+                font-size: 22px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-left {
+                flex-wrap: wrap;
+            }
+
+            .filter-group .btn {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 24px;
+                margin: 12px;
+            }
+
+            thead th,
+            tbody td {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .product-name .sku {
+                display: none;
+            }
+
+            .action-btns .btn {
+                padding: 2px 8px;
+                font-size: 11px;
+            }
         }
-        .shan-pattern {
-            background-color: #006A4E;
-            background-image: radial-gradient(#FCD116 1px, transparent 1px), radial-gradient(#D21034 1px, #006A4E 1px);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
-            opacity: 0.95;
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-actions {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .toolbar-right {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .toolbar-right .btn {
+                flex: 1;
+                justify-content: center;
+            }
         }
-        .shan-sun {
-            width: 50px;
-            height: 50px;
-            background-color: white;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+
+        /* ---------- 滚动条美化 ---------- */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
         }
     </style>
 </head>
-<body class="text-gray-800 pb-24">
+<body>
 
-    <!-- Header / Banner -->
-    <header class="shan-pattern text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="shan-sun flex items-center justify-center text-shanGreen font-bold text-xl shadow-inner">
-                    <i class="fa-solid font-bold text-amber-600">🍜</i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-shanYellow tracking-wide">တိုင်လွိုင် ရှမ်းရိုးရာ စားသောက်ဆိုင်</h1>
-                    <p class="text-xs text-gray-200">ရှမ်းပြည်နယ်ရဲ့ စစ်မှန်သော အရသာ ရိုးရာအစားအစာများ</p>
-                </div>
+    <div class="app-container">
+
+        <!-- ====== 导航栏 ====== -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-warehouse"></i>
+                智能仓库
+                <span>v2.0</span>
             </div>
-            
-            <!-- Admin Settings Button -->
-            <button onclick="openAdminAuthModal()" class="bg-shanYellow text-gray-900 p-2.5 rounded-full hover:bg-yellow-400 transition shadow-md flex items-center justify-center space-x-1" title="Admin Control Panel">
-                <i class="fa-solid fa-user-shield text-lg"></i>
-            </button>
-        </div>
-        <!-- Shan Flag Stripe Bar -->
-        <div class="h-2 w-full flex">
-            <div class="w-1/3 bg-shanYellow"></div>
-            <div class="w-1/3 bg-shanGreen"></div>
-            <div class="w-1/3 bg-shanRed"></div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="max-w-4xl mx-auto px-4 py-6">
-
-        <!-- Banner Announcement -->
-        <div class="bg-amber-100 border-l-4 border-amber-600 p-4 rounded-r-lg mb-6 shadow-sm flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-bullhorn text-amber-700 text-xl"></i>
-                <span class="text-amber-900 text-sm font-semibold">မင်္ဂလာပါ... ရှမ်းရိုးရာ အစားအစာများကို အလွယ်တကူ မှာယူနိုင်ပါသည်။</span>
-            </div>
-        </div>
-
-        <!-- Menu Categories Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-shanGreen border-b-2 border-shanYellow pb-2 mb-4 flex items-center">
-                <i class="fa-solid fa-utensils mr-2 text-shanRed"></i> စားသောက်ဖွယ်ရာ မီနူးများ (Menu)
-            </h2>
-
-            <!-- Menu Cards Grid -->
-            <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Javascript will dynamically inject items here -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Floating Cart Bar (Bottom) -->
-    <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-shanYellow shadow-2xl p-4 z-40 hidden">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="relative">
-                    <i class="fa-solid fa-basket-shopping text-3xl text-shanGreen"></i>
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-shanRed text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+            <div class="navbar-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索商品名称 / SKU..." />
                 </div>
-                <div>
-                    <div class="text-xs text-gray-500">စုစုပေါင်း ကျသင့်ငွေ</div>
-                    <div id="cart-total" class="text-lg font-bold text-shanRed">0 ကျပ်</div>
-                </div>
-            </div>
-            <button onclick="openOrderModal()" class="bg-shanGreen hover:bg-emerald-800 text-white font-bold py-2.5 px-6 rounded-lg shadow-md transition flex items-center space-x-2">
-                <span>အော်ဒါကြည့်ရန်</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Order Modal -->
-    <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden border-2 border-shanYellow">
-            
-            <!-- Modal Header -->
-            <div class="bg-shanGreen text-white p-4 flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center">
-                    <i class="fa-solid fa-receipt mr-2 text-shanYellow"></i> အော်ဒါအတည်ပြုခြင်း
-                </h3>
-                <button onclick="closeOrderModal()" class="text-gray-300 hover:text-white text-xl">
-                    <i class="fa-solid fa-xmark"></i>
+                <button class="btn btn-primary" id="openAddModalBtn">
+                    <i class="fas fa-plus"></i> 新增商品
                 </button>
             </div>
+        </nav>
 
-            <!-- Modal Body (Scrollable) -->
-            <div class="p-4 overflow-y-auto flex-1 space-y-4">
-                
-                <!-- Selected Items List -->
-                <div>
-                    <h4 class="font-bold text-gray-700 text-sm border-b pb-1 mb-2">မှာယူထားသော ဟင်းပွဲများ</h4>
-                    <div id="order-items-list" class="space-y-2 text-sm divide-y">
-                        <!-- Dynamic Cart List -->
-                    </div>
+        <!-- ====== 统计卡片 ====== -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>总库存商品</h4>
+                    <div class="number" id="totalItems">0</div>
+                </div>
+                <div class="stat-icon blue"><i class="fas fa-boxes"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>总数量</h4>
+                    <div class="number" id="totalQuantity">0</div>
+                </div>
+                <div class="stat-icon green"><i class="fas fa-cubes"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>低库存预警</h4>
+                    <div class="number" id="lowStockCount">0</div>
+                </div>
+                <div class="stat-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h4>品类数量</h4>
+                    <div class="number" id="categoryCount">0</div>
+                </div>
+                <div class="stat-icon red"><i class="fas fa-tags"></i></div>
+            </div>
+        </div>
+
+        <!-- ====== 工具栏 ====== -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <h2><i class="fas fa-list-ul" style="color:var(--primary);margin-right:8px;"></i>库存列表</h2>
+                <div class="filter-group" id="filterGroup">
+                    <button class="btn active" data-filter="all">全部</button>
+                    <button class="btn" data-filter="instock">充足</button>
+                    <button class="btn" data-filter="low">低库存</button>
+                    <button class="btn" data-filter="out">缺货</button>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-outline btn-sm" id="exportBtn"><i class="fas fa-download"></i> 导出</button>
+                <button class="btn btn-outline btn-sm" id="refreshBtn"><i class="fas fa-sync"></i> 刷新</button>
+            </div>
+        </div>
+
+        <!-- ====== 表格 ====== -->
+        <div class="table-wrapper">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品信息</th>
+                            <th>分类</th>
+                            <th>单价</th>
+                            <th>库存</th>
+                            <th>状态</th>
+                            <th style="text-align:right;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- 动态渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ====== 模态框：新增 / 编辑 ====== -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">新增商品</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="productForm" autocomplete="off">
+                <input type="hidden" id="editId" value="" />
+
+                <div class="form-group">
+                    <label for="prodName">商品名称 *</label>
+                    <input type="text" id="prodName" placeholder="例：无线鼠标" required />
                 </div>
 
-                <!-- Total Summary -->
-                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 flex justify-between items-center font-bold">
-                    <span>စုစုပေါင်း ကျသင့်ငွေ:</span>
-                    <span id="modal-total-price" class="text-shanRed text-lg">0 ကျပ်</span>
-                </div>
-
-                <!-- Customer Info Form -->
-                <form id="order-form" class="space-y-3 pt-2">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">
-                            Telegram @username <span class="text-red-500">* (မဖြစ်မနေ ထည့်ရန်)</span>
-                        </label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">@</span>
-                            <input type="text" id="cust-telegram" required placeholder="username" class="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prodSku">SKU *</label>
+                        <input type="text" id="prodSku" placeholder="例：M-001" required />
                     </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">နာမည်</label>
-                            <input type="text" id="cust-name" placeholder="မောင်မောင်" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">ဖုန်းနံပါတ်</label>
-                            <input type="tel" id="cust-phone" placeholder="09xxxxxxxxx" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">စားသောက်မည့် ပုံစံ</label>
-                        <select id="dining-option" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen bg-white">
-                            <option value="ဆိုင်စား">ဆိုင်စားမည်</option>
-                            <option value="ပါဆယ်">ပါဆယ်ယူမည်</option>
+                    <div class="form-group">
+                        <label for="prodCategory">分类 *</label>
+                        <select id="prodCategory" required>
+                            <option value="电子产品">电子产品</option>
+                            <option value="办公用品">办公用品</option>
+                            <option value="日用百货">日用百货</option>
+                            <option value="食品饮料">食品饮料</option>
+                            <option value="服装鞋帽">服装鞋帽</option>
+                            <option value="其他">其他</option>
                         </select>
                     </div>
-
-                    <!-- Payment Method -->
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">ငွေပေးချေမှု စနစ် <span class="text-red-500">*</span></label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="border rounded-lg p-3 flex items-center space-x-2 cursor-pointer hover:bg-amber-50">
-                                <input type="radio" name="payment" value="ငွေသား" checked onchange="togglePaymentUI()" class="text-shanGreen">
-                                <span class="text-sm font-semibold">💵 ငွေသား</span>
-                            </label>
-                            <label class="border rounded-lg p-3 flex items-center space-x-2 cursor-pointer hover:bg-amber-50">
-                                <input type="radio" name="payment" value="KBZ Pay QR" onchange="togglePaymentUI()" class="text-shanGreen">
-                                <span class="text-sm font-semibold">📱 KBZ Pay QR</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- KBZ Pay QR Display Area -->
-                    <div id="kbz-pay-area" class="hidden bg-blue-50 border border-blue-200 p-3 rounded-lg text-center">
-                        <p class="text-xs font-bold text-blue-900 mb-2">KBZ Pay QR ဖြင့် ငွေလွှဲရန် scan ဖတ်ပါ</p>
-                        <!-- Generated SVG QR Placeholder for KBZ Pay -->
-                        <div class="bg-white p-2 inline-block rounded shadow-sm border border-blue-100">
-                            <svg class="w-36 h-36 mx-auto" viewBox="0 0 100 100">
-                                <rect width="100" height="100" fill="#ffffff"/>
-                                <rect x="10" y="10" width="25" height="25" fill="#003399"/>
-                                <rect x="15" y="15" width="15" height="15" fill="#ffffff"/>
-                                <rect x="18" y="18" width="9" height="9" fill="#003399"/>
-                                <rect x="65" y="10" width="25" height="25" fill="#003399"/>
-                                <rect x="70" y="15" width="15" height="15" fill="#ffffff"/>
-                                <rect x="73" y="18" width="9" height="9" fill="#003399"/>
-                                <rect x="10" y="65" width="25" height="25" fill="#003399"/>
-                                <rect x="15" y="70" width="15" height="15" fill="#ffffff"/>
-                                <rect x="18" y="73" width="9" height="9" fill="#003399"/>
-                                <rect x="40" y="15" width="10" height="10" fill="#003399"/>
-                                <rect x="45" y="35" width="15" height="15" fill="#003399"/>
-                                <rect x="65" y="55" width="20" height="10" fill="#003399"/>
-                                <rect x="40" y="70" width="15" height="20" fill="#003399"/>
-                                <rect x="70" y="75" width="15" height="15" fill="#003399"/>
-                            </svg>
-                        </div>
-                        <p class="text-xs text-gray-600 mt-1">KPay Phone: <span class="font-bold text-blue-800">09-123456789</span></p>
-                        <p class="text-xs text-gray-500">Name: Shan Yoma Restaurant</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">မှတ်ချက် (ဆီလျှော့/အစပ်ကဲ စသည်ဖြင့်)</label>
-                        <textarea id="cust-note" rows="2" placeholder="အပိုဆောင်းမှာယူလိုသည်များ..." class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-shanGreen"></textarea>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="p-4 bg-gray-50 border-t flex space-x-2">
-                <button onclick="closeOrderModal()" class="w-1/3 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2.5 rounded-lg font-bold transition text-sm">
-                    မလုပ်တော့ပါ
-                </button>
-                <button onclick="submitOrder()" class="w-2/3 bg-shanRed hover:bg-red-700 text-white py-2.5 rounded-lg font-bold transition shadow-md flex items-center justify-center space-x-2 text-sm">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>အော်ဒါအတည်ပြုမည်</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Authentication Password Modal -->
-    <div id="admin-auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-5 border-2 border-shanYellow">
-            <div class="text-center mb-4">
-                <div class="w-12 h-12 bg-shanYellow rounded-full flex items-center justify-center mx-auto mb-2 text-xl text-gray-800">
-                    <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800">Admin Login</h3>
-                <p class="text-xs text-gray-500">Admin Panel သို့ဝင်ရောက်ရန် Password ရိုက်ထည့်ပါ</p>
-                <p class="text-[10px] text-amber-600 mt-1">(Default Password: <b>1234</b>)</p>
-            </div>
-            
-            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
-                <div>
-                    <input type="password" id="admin-pass-input" placeholder="Password ရိုက်ထည့်ပါ" class="w-full p-2.5 border rounded-lg text-sm text-center focus:outline-none focus:border-shanGreen" required>
-                    <p id="admin-pass-error" class="text-xs text-red-500 mt-1 hidden text-center">Password မှားယွင်းနေပါသည်။</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prodPrice">单价 (元) *</label>
+                        <input type="number" id="prodPrice" placeholder="0.00" step="0.01" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="prodQuantity">库存数量 *</label>
+                        <input type="number" id="prodQuantity" placeholder="0" step="1" min="0" required />
+                    </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 bg-gray-300 text-gray-800 py-2 rounded-lg text-xs font-bold">မလုပ်တော့ပါ</button>
-                    <button type="submit" class="w-1/2 bg-shanGreen text-white py-2 rounded-lg text-xs font-bold hover:bg-emerald-800">ဝင်မည်</button>
+
+                <div class="form-group">
+                    <label for="prodMinStock">低库存阈值</label>
+                    <input type="number" id="prodMinStock" placeholder="默认 5" step="1" min="0" value="5" />
+                </div>
+
+                <div class="form-group">
+                    <label for="prodDesc">备注</label>
+                    <textarea id="prodDesc" placeholder="可选填写商品备注信息..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelModalBtn">取消</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> 保存
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Telegram Bot & Admin Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 border-2 border-shanYellow max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-3 border-b pb-2">
-                <h3 class="text-lg font-bold text-shanGreen flex items-center">
-                    <i class="fa-solid fa-robot mr-2"></i> Admin Panel (Telegram Settings)
-                </h3>
-                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+    <!-- ====== Toast 容器 ====== -->
+    <div class="toast-container" id="toastContainer"></div>
 
-            <!-- Telegram Bot Config -->
-            <div class="space-y-3 mb-6">
-                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Telegram Bot ချိတ်ဆက်မှု</h4>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Bot Token</label>
-                    <input type="text" id="bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQ..." class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Admin Chat ID</label>
-                    <input type="text" id="chat-id" placeholder="e.g. 987654321" class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
-                </div>
-            </div>
-
-            <!-- Change Admin Password Section -->
-            <div class="space-y-3 border-t pt-4">
-                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Admin Password ပြောင်းလဲရန်</h4>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Password အသစ်</label>
-                    <input type="password" id="new-admin-pass" placeholder="Password အသစ်ရိုက်ပါ" class="w-full p-2 border rounded-lg text-xs focus:outline-none focus:border-shanGreen">
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end space-x-2 border-t pt-3">
-                <button onclick="toggleSettingsModal()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-xs font-bold">ပိတ်မည်</button>
-                <button onclick="saveBotSettings()" class="bg-shanGreen text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-800">သိမ်းဆည်းမည်</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript Application Logic -->
     <script>
-        // Menu Items Data
-        const menuData = [
-            {
-                id: 'tofu-noodle',
-                name: 'တိုဖူးခေါက်ဆွဲ',
-                icon: '🍜',
-                price: 3500,
-                options: ['ကြက်သား', 'ဝက်သား']
-            },
-            {
-                id: 'shan-noodle',
-                name: 'ရှမ်းခေါက်ဆွဲ',
-                icon: '🥣',
-                price: 3500,
-                options: ['ကြက်သား', 'ဝက်သား']
-            },
-            {
-                id: 'ye-seim-noodle',
-                name: 'ရေစိမ်ခေါက်ဆွဲ',
-                icon: '🍲',
-                price: 3500,
-                options: ['ကြက်သား', 'ဝက်သား']
-            },
-            {
-                id: 'mala-hin',
-                name: 'မာလာဟင်း',
-                icon: '🥘',
-                price: 6000,
-                options: ['ကြက်သား', 'ဝက်သား']
-            },
-            {
-                id: 'mala-xiang-guo',
-                name: 'မာလာရှမ်းကော',
-                icon: '🍱',
-                price: 8000,
-                options: ['ကြက်သား', 'ဝက်သား', 'ပင်လယ်စာ']
-            },
-            {
-                id: 'drinks',
-                name: 'အချိုရည်အမျိုးမျိုး',
-                icon: '🥤',
-                price: 1500,
-                options: ['Coca Cola', 'Sprite', 'Green Tea', 'သံပုရာရည်']
+        // ============================================================
+        //  数据层
+        // ============================================================
+        const STORAGE_KEY = 'warehouse_products';
+
+        // 默认示例数据
+        const defaultProducts = [{
+            id: '1',
+            name: '无线静音鼠标',
+            sku: 'M-1001',
+            category: '电子产品',
+            price: 39.90,
+            quantity: 28,
+            minStock: 5,
+            desc: '办公家用，USB接收器'
+        }, {
+            id: '2',
+            name: 'A4 打印纸 70g',
+            sku: 'P-2023',
+            category: '办公用品',
+            price: 22.50,
+            quantity: 3,
+            minStock: 5,
+            desc: '500张/包，中性纸'
+        }, {
+            id: '3',
+            name: '不锈钢保温杯',
+            sku: 'C-8802',
+            category: '日用百货',
+            price: 69.00,
+            quantity: 12,
+            minStock: 3,
+            desc: '500ml，真空保温'
+        }, {
+            id: '4',
+            name: '运动蓝牙耳机',
+            sku: 'E-009',
+            category: '电子产品',
+            price: 159.00,
+            quantity: 0,
+            minStock: 5,
+            desc: 'IPX5防水，续航8小时'
+        }, {
+            id: '5',
+            name: '文件夹 10个装',
+            sku: 'F-320',
+            category: '办公用品',
+            price: 18.00,
+            quantity: 45,
+            minStock: 10,
+            desc: 'A4，蓝色'
+        }];
+
+        // 读取数据
+        function loadProducts() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                try { return JSON.parse(data); } catch { /* ignore */ }
             }
-        ];
+            // 首次使用写入默认数据
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+            return defaultProducts;
+        }
 
-        // Global State
-        let cart = [];
-        let botToken = localStorage.getItem('tg_bot_token') || '';
-        let chatId = localStorage.getItem('tg_chat_id') || '';
-        let adminPassword = localStorage.getItem('admin_pass') || '1234'; // Default Password: 1234
+        function saveProducts(products) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+        }
 
-        // Initialize App
-        window.onload = function() {
-            renderMenu();
-            document.getElementById('bot-token').value = botToken;
-            document.getElementById('chat-id').value = chatId;
-        };
+        // 生成短 id
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        }
 
-        // Render Menu Cards
-        function renderMenu() {
-            const container = document.getElementById('menu-container');
-            container.innerHTML = '';
+        // ============================================================
+        //  状态
+        // ============================================================
+        let products = loadProducts();
+        let currentFilter = 'all';
+        let searchKeyword = '';
 
-            menuData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl border border-shanBorder shadow-sm hover:shadow-md transition flex flex-col justify-between";
-                
-                let optionsHTML = item.options.map((opt, idx) => `
-                    <label class="inline-flex items-center mr-3 mb-1 cursor-pointer text-xs">
-                        <input type="radio" name="meat-${item.id}" value="${opt}" ${idx === 0 ? 'checked' : ''} class="text-shanGreen focus:ring-shanGreen">
-                        <span class="ml-1 text-gray-700">${opt}</span>
-                    </label>
-                `).join('');
+        // ============================================================
+        //  DOM 引用
+        // ============================================================
+        const tbody = document.getElementById('productTableBody');
+        const totalItemsEl = document.getElementById('totalItems');
+        const totalQuantityEl = document.getElementById('totalQuantity');
+        const lowStockCountEl = document.getElementById('lowStockCount');
+        const categoryCountEl = document.getElementById('categoryCount');
 
-                card.innerHTML = `
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-4xl bg-amber-50 p-2 rounded-lg border border-amber-100">${item.icon}</span>
-                            <div>
-                                <h3 class="font-bold text-gray-800 text-base">${item.name}</h3>
-                                <p class="text-shanRed font-bold text-sm">${item.price.toLocaleString()} ကျပ်</p>
+        const searchInput = document.getElementById('searchInput');
+        const filterGroup = document.getElementById('filterGroup');
+        const openAddModalBtn = document.getElementById('openAddModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        const productModal = document.getElementById('productModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const editId = document.getElementById('editId');
+        const productForm = document.getElementById('productForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const refreshBtn = document.getElementById('refreshBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // ============================================================
+        //  工具函数
+        // ============================================================
+        function getStockStatus(product) {
+            if (product.quantity <= 0) return 'out';
+            if (product.quantity < product.minStock) return 'low';
+            return 'instock';
+        }
+
+        function getStockLabel(product) {
+            const status = getStockStatus(product);
+            if (status === 'out') return { text: '缺货', cls: 'badge-out' };
+            if (status === 'low') return { text: '低库存', cls: 'badge-low' };
+            return { text: '充足', cls: 'badge-instock' };
+        }
+
+        // 筛选 & 搜索
+        function getFilteredProducts() {
+            return products.filter(p => {
+                // 搜索
+                const kw = searchKeyword.trim().toLowerCase();
+                if (kw) {
+                    const match = p.name.toLowerCase().includes(kw) ||
+                        p.sku.toLowerCase().includes(kw) ||
+                        p.category.toLowerCase().includes(kw);
+                    if (!match) return false;
+                }
+                // 筛选
+                if (currentFilter === 'instock') return getStockStatus(p) === 'instock';
+                if (currentFilter === 'low') return getStockStatus(p) === 'low';
+                if (currentFilter === 'out') return getStockStatus(p) === 'out';
+                return true;
+            });
+        }
+
+        // ============================================================
+        //  渲染
+        // ============================================================
+        function render() {
+            const filtered = getFilteredProducts();
+            // 更新统计
+            const total = products.length;
+            const totalQty = products.reduce((sum, p) => sum + p.quantity, 0);
+            const lowCount = products.filter(p => getStockStatus(p) === 'low' || getStockStatus(p) === 'out').length;
+            const categories = new Set(products.map(p => p.category));
+            totalItemsEl.textContent = total;
+            totalQuantityEl.textContent = totalQty;
+            lowStockCountEl.textContent = lowCount;
+            categoryCountEl.textContent = categories.size;
+
+            // 表格
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-box-open"></i>
+                                <h3>暂无商品</h3>
+                                <p style="color:var(--gray-400);font-size:14px;">点击「新增商品」添加第一个库存</p>
                             </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="my-2 bg-gray-50 p-2 rounded border border-gray-100">
-                            <span class="text-xs font-bold text-gray-500 block mb-1">အမျိုးအစား ရွေးရန်:</span>
-                            <div class="flex flex-wrap">${optionsHTML}</div>
-                        </div>
-                        <button onclick="addToCart('${item.id}')" class="w-full mt-2 bg-shanYellow hover:bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded-lg shadow transition flex items-center justify-center space-x-1 text-sm">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                            <span>မှာယူမည်</span>
-                        </button>
-                    </div>
+                        </td>
+                    </tr>
                 `;
-                container.appendChild(card);
-            });
-        }
-
-        // Add Item to Cart
-        function addToCart(itemId) {
-            const item = menuData.find(m => m.id === itemId);
-            const selectedMeat = document.querySelector(`input[name="meat-${itemId}"]:checked`).value;
-            
-            const cartItemId = `${itemId}-${selectedMeat}`;
-            const existing = cart.find(c => c.cartItemId === cartItemId);
-
-            if(existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({
-                    cartItemId: cartItemId,
-                    id: item.id,
-                    name: item.name,
-                    option: selectedMeat,
-                    price: item.price,
-                    qty: 1
-                });
-            }
-
-            updateCartUI();
-        }
-
-        // Update Floating Cart Bar
-        function updateCartUI() {
-            const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
-            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-            document.getElementById('cart-count').innerText = totalCount;
-            document.getElementById('cart-total').innerText = totalPrice.toLocaleString() + ' ကျပ်';
-
-            const cartBar = document.getElementById('cart-bar');
-            if (totalCount > 0) {
-                cartBar.classList.remove('hidden');
-            } else {
-                cartBar.classList.add('hidden');
-            }
-        }
-
-        // Open Order Confirmation Modal
-        function openOrderModal() {
-            if(cart.length === 0) return;
-
-            const listContainer = document.getElementById('order-items-list');
-            listContainer.innerHTML = '';
-
-            let total = 0;
-            cart.forEach((item, idx) => {
-                const subtotal = item.price * item.qty;
-                total += subtotal;
-
-                const row = document.createElement('div');
-                row.className = "flex items-center justify-between py-2";
-                row.innerHTML = `
-                    <div>
-                        <div class="font-bold text-gray-800">${item.name} (${item.option})</div>
-                        <div class="text-xs text-gray-500">${item.price.toLocaleString()} x ${item.qty}</div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="font-bold text-gray-700">${subtotal.toLocaleString()} ကျပ်</span>
-                        <div class="flex items-center border rounded">
-                            <button onclick="changeQty(${idx}, -1)" class="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold">-</button>
-                            <span class="px-2 text-xs font-bold">${item.qty}</span>
-                            <button onclick="changeQty(${idx}, 1)" class="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 text-xs font-bold">+</button>
-                        </div>
-                    </div>
-                `;
-                listContainer.appendChild(row);
-            });
-
-            document.getElementById('modal-total-price').innerText = total.toLocaleString() + ' ကျပ်';
-            document.getElementById('order-modal').classList.remove('hidden');
-        }
-
-        // Change Quantity in Modal
-        function changeQty(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
-            updateCartUI();
-            if(cart.length === 0) {
-                closeOrderModal();
-            } else {
-                openOrderModal();
-            }
-        }
-
-        function closeOrderModal() {
-            document.getElementById('order-modal').classList.add('hidden');
-        }
-
-        // Toggle KBZ Pay UI
-        function togglePaymentUI() {
-            const payVal = document.querySelector('input[name="payment"]:checked').value;
-            const kbzArea = document.getElementById('kbz-pay-area');
-            if(payVal === 'KBZ Pay QR') {
-                kbzArea.classList.remove('hidden');
-            } else {
-                kbzArea.classList.add('hidden');
-            }
-        }
-
-        // Submit Order to Telegram Bot
-        async function submitOrder() {
-            const telegramInput = document.getElementById('cust-telegram').value.trim();
-            const nameInput = document.getElementById('cust-name').value.trim() || 'မသိရပါ';
-            const phoneInput = document.getElementById('cust-phone').value.trim() || 'မသိရပါ';
-            const diningOption = document.getElementById('dining-option').value;
-            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-            const noteInput = document.getElementById('cust-note').value.trim();
-
-            if(!telegramInput) {
-                alert('ကျေးဇူးပြု၍ Telegram @username ကို မဖြစ်မနေ ဖြည့်သွင်းပေးပါခင်ဗျာ။');
-                document.getElementById('cust-telegram').focus();
                 return;
             }
 
-            const cleanTelegram = telegramInput.replace('@', '');
-            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            tbody.innerHTML = filtered.map(p => {
+                const status = getStockLabel(p);
+                const avatarLetter = p.name.charAt(0).toUpperCase();
+                return `
+                    <tr>
+                        <td>
+                            <div class="product-name">
+                                <div class="product-avatar">${avatarLetter}</div>
+                                <div>
+                                    <div class="name">${escapeHtml(p.name)}</div>
+                                    <span class="sku">SKU: ${escapeHtml(p.sku)}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-category">${escapeHtml(p.category)}</span></td>
+                        <td>¥${p.price.toFixed(2)}</td>
+                        <td><strong>${p.quantity}</strong></td>
+                        <td><span class="badge ${status.cls}">${status.text}</span></td>
+                        <td style="text-align:right;">
+                            <div class="action-btns" style="justify-content:flex-end;">
+                                <button class="btn btn-primary btn-sm edit-btn" data-id="${p.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-success btn-sm in-btn" data-id="${p.id}">
+                                    <i class="fas fa-arrow-down"></i> 入库
+                                </button>
+                                <button class="btn btn-warning btn-sm out-btn" data-id="${p.id}">
+                                    <i class="fas fa-arrow-up"></i> 出库
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-btn" data-id="${p.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
-            // Construct Telegram Message
-            let msg = `🇲🇲 <b>[အော်ဒါအသစ် ရောက်ရှိပါပြီ]</b> 🇲🇲\n\n`;
-            msg += `👤 <b>ဝယ်ယူသူ:</b> ${nameInput}\n`;
-            msg += `📱 <b>Telegram:</b> @${cleanTelegram}\n`;
-            msg += `📞 <b>ဖုန်း:</b> ${phoneInput}\n`;
-            msg += `🍽️ <b>စားသောက်မည့်ပုံစံ:</b> ${diningOption}\n`;
-            msg += `💳 <b>ငွေပေးချေမှု:</b> ${paymentMethod}\n`;
-            if(noteInput) msg += `📝 <b>မှတ်ချက်:</b> ${noteInput}\n`;
-            msg += `\n🛒 <b>မှာယူထားသော စာရင်းများ:</b>\n`;
-            
-            cart.forEach((item, i) => {
-                msg += `${i+1}. ${item.name} (${item.option}) - ${item.qty} ပွဲ = ${(item.price * item.qty).toLocaleString()} ကျပ်\n`;
+            // 绑定行内按钮事件 (事件委托)
+            // 但为了避免重复绑定，使用全局委托在 document 上处理
+        }
+
+        // 简单防 XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        //  事件委托 (行内按钮)
+        // ============================================================
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            // 编辑
+            if (target.classList.contains('edit-btn')) {
+                const id = target.dataset.id;
+                openEditModal(id);
+                return;
+            }
+
+            // 入库
+            if (target.classList.contains('in-btn')) {
+                const id = target.dataset.id;
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+                const qty = parseInt(prompt(`「${product.name}」入库数量：`, '1'));
+                if (!isNaN(qty) && qty > 0) {
+                    product.quantity += qty;
+                    saveProducts(products);
+                    render();
+                    showToast(`✅ 入库成功：${product.name} +${qty}`, 'success');
+                } else if (qty !== null) {
+                    showToast('请输入有效的数量', 'warning');
+                }
+                return;
+            }
+
+            // 出库
+            if (target.classList.contains('out-btn')) {
+                const id = target.dataset.id;
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+                if (product.quantity <= 0) {
+                    showToast(`⚠️ 「${product.name}」库存已为 0，无法出库`, 'error');
+                    return;
+                }
+                const qty = parseInt(prompt(`「${product.name}」出库数量（当前库存 ${product.quantity}）：`, '1'));
+                if (!isNaN(qty) && qty > 0) {
+                    if (qty > product.quantity) {
+                        showToast(`❌ 出库数量不能大于当前库存 (${product.quantity})`, 'error');
+                        return;
+                    }
+                    product.quantity -= qty;
+                    saveProducts(products);
+                    render();
+                    showToast(`📦 出库成功：${product.name} -${qty}`, 'success');
+                } else if (qty !== null) {
+                    showToast('请输入有效的数量', 'warning');
+                }
+                return;
+            }
+
+            // 删除
+            if (target.classList.contains('delete-btn')) {
+                const id = target.dataset.id;
+                const product = products.find(p => p.id === id);
+                if (!product) return;
+                if (confirm(`确定要删除商品「${product.name}」吗？`)) {
+                    products = products.filter(p => p.id !== id);
+                    saveProducts(products);
+                    render();
+                    showToast(`🗑️ 已删除：${product.name}`, 'warning');
+                }
+                return;
+            }
+        });
+
+        // ============================================================
+        //  模态框逻辑
+        // ============================================================
+        function openModal(title, data = null) {
+            modalTitle.textContent = title;
+            if (data) {
+                editId.value = data.id;
+                document.getElementById('prodName').value = data.name;
+                document.getElementById('prodSku').value = data.sku;
+                document.getElementById('prodCategory').value = data.category;
+                document.getElementById('prodPrice').value = data.price;
+                document.getElementById('prodQuantity').value = data.quantity;
+                document.getElementById('prodMinStock').value = data.minStock || 5;
+                document.getElementById('prodDesc').value = data.desc || '';
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> 更新';
+            } else {
+                editId.value = '';
+                productForm.reset();
+                document.getElementById('prodMinStock').value = 5;
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> 新增';
+            }
+            productModal.classList.add('active');
+        }
+
+        function closeModal() {
+            productModal.classList.remove('active');
+        }
+
+        function openAddModal() {
+            openModal('新增商品');
+        }
+
+        function openEditModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) {
+                showToast('商品不存在', 'error');
+                return;
+            }
+            openModal('编辑商品', product);
+        }
+
+        // 模态框按钮
+        openAddModalBtn.addEventListener('click', openAddModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+        productModal.addEventListener('click', function(e) {
+            if (e.target === productModal) closeModal();
+        });
+
+        // 表单提交
+        productForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('prodName').value.trim();
+            const sku = document.getElementById('prodSku').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const quantity = parseInt(document.getElementById('prodQuantity').value);
+            const minStock = parseInt(document.getElementById('prodMinStock').value) || 5;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const editIdVal = editId.value;
+
+            // 校验
+            if (!name || !sku) {
+                showToast('请填写商品名称和 SKU', 'warning');
+                return;
+            }
+            if (isNaN(price) || price < 0) {
+                showToast('请输入有效的价格', 'warning');
+                return;
+            }
+            if (isNaN(quantity) || quantity < 0) {
+                showToast('请输入有效的库存数量', 'warning');
+                return;
+            }
+
+            if (editIdVal) {
+                // 编辑
+                const index = products.findIndex(p => p.id === editIdVal);
+                if (index === -1) {
+                    showToast('商品不存在', 'error');
+                    return;
+                }
+                // 检查 SKU 是否与其他商品冲突 (排除自身)
+                const conflict = products.some((p, i) => p.sku === sku && i !== index);
+                if (conflict) {
+                    showToast('SKU 已存在，请更换', 'warning');
+                    return;
+                }
+                products[index] = {
+                    ...products[index],
+                    name,
+                    sku,
+                    category,
+                    price,
+                    quantity,
+                    minStock,
+                    desc
+                };
+                saveProducts(products);
+                render();
+                closeModal();
+                showToast(`✅ 已更新：${name}`, 'success');
+            } else {
+                // 新增
+                const conflict = products.some(p => p.sku === sku);
+                if (conflict) {
+                    showToast('SKU 已存在，请更换', 'warning');
+                    return;
+                }
+                const newProduct = {
+                    id: generateId(),
+                    name,
+                    sku,
+                    category,
+                    price,
+                    quantity,
+                    minStock,
+                    desc
+                };
+                products.push(newProduct);
+                saveProducts(products);
+                render();
+                closeModal();
+                showToast(`🎉 新增成功：${name}`, 'success');
+            }
+        });
+
+        // ============================================================
+        //  搜索 & 筛选
+        // ============================================================
+        searchInput.addEventListener('input', function() {
+            searchKeyword = this.value;
+            render();
+        });
+
+        filterGroup.addEventListener('click', function(e) {
+            const btn = e.target.closest('button');
+            if (!btn || !btn.dataset.filter) return;
+            filterGroup.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            render();
+        });
+
+        // ============================================================
+        //  刷新 & 导出
+        // ============================================================
+        refreshBtn.addEventListener('click', function() {
+            products = loadProducts();
+            render();
+            showToast('🔄 已刷新数据', 'success');
+        });
+
+        exportBtn.addEventListener('click', function() {
+            const filtered = getFilteredProducts();
+            if (filtered.length === 0) {
+                showToast('没有数据可导出', 'warning');
+                return;
+            }
+            // 生成 CSV
+            const headers = ['名称', 'SKU', '分类', '单价', '库存', '阈值', '状态', '备注'];
+            const rows = filtered.map(p => {
+                const status = getStockLabel(p).text;
+                return [p.name, p.sku, p.category, p.price.toFixed(2), p.quantity, p.minStock, status, p.desc || ''];
+            });
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(v => `"${v}"`).join(',') + '\n';
             });
 
-            msg += `\n💰 <b>စုစုပေါင်း ကျသင့်ငွေ:</b> ${totalPrice.toLocaleString()} ကျပ်`;
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); // BOM 支持 Excel
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `仓库库存_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast('📥 导出成功', 'success');
+        });
 
-            // Telegram API Call
-            if(botToken && chatId) {
-                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: msg,
-                            parse_mode: 'HTML'
-                        })
-                    });
-                    const resData = await response.json();
-                    if(resData.ok) {
-                        alert('လူကြီးမင်း၏ အော်ဒါကို အောင်မြင်စွာ ပေးပို့ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်!');
-                    } else {
-                        alert('Telegram သို့ အော်ဒါပို့ရာတွင် အမှားအယွင်းရှိနေပါသည်။ Bot Token နှင့် Chat ID အမှန်စစ်ဆေးပါ။');
-                    }
-                } catch(err) {
-                    alert('အော်ဒါ ပို့ဆောင်၍ မရပါခင်ဗျာ။ ကွန်ရက် အချိတ်အဆက်ကို စစ်ဆေးပါ။');
-                }
-            } else {
-                console.log("Telegram Order Details:\n", msg);
-                alert(`[Demo Mode] လူကြီးမင်း၏ အော်ဒါ အောင်မြင်ပါသည်။\n\n(Telegram Bot ဖြင့် ချိတ်ဆက်လိုပါက အပေါ်ဘက်ရှိ Settings ခလုတ်မှတစ်ဆင့် Admin ဝင်ရောက်ကာ Bot Token ထည့်သွင်းပါ)`);
-            }
+        // ============================================================
+        //  Toast 通知
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-times-circle',
+                warning: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle'
+            };
+            const icon = iconMap[type] || iconMap.info;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="${icon}"></i>
+                <span>${message}</span>
+                <button class="toast-close">&times;</button>
+            `;
+            container.appendChild(toast);
 
-            // Reset Cart and Close Modal
-            cart = [];
-            updateCartUI();
-            closeOrderModal();
-            document.getElementById('order-form').reset();
+            // 自动移除
+            const timer = setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3500);
+
+            toast.querySelector('.toast-close').addEventListener('click', function() {
+                clearTimeout(timer);
+                toast.remove();
+            });
+
+            // 点击移除
+            toast.addEventListener('click', function() {
+                clearTimeout(timer);
+                toast.remove();
+            });
         }
 
-        // Admin Auth Modal Functions
-        function openAdminAuthModal() {
-            document.getElementById('admin-pass-input').value = '';
-            document.getElementById('admin-pass-error').classList.add('hidden');
-            document.getElementById('admin-auth-modal').classList.remove('hidden');
+        // ============================================================
+        //  初始化
+        // ============================================================
+        render();
+
+        // 如果没有任何数据，显示一条提示
+        if (products.length === 0) {
+            showToast('📋 仓库空空如也，添加第一个商品吧！', 'info');
         }
 
-        function closeAdminAuthModal() {
-            document.getElementById('admin-auth-modal').classList.add('hidden');
-        }
-
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const inputPass = document.getElementById('admin-pass-input').value;
-            if(inputPass === adminPassword) {
-                closeAdminAuthModal();
-                toggleSettingsModal();
-            } else {
-                document.getElementById('admin-pass-error').classList.remove('hidden');
-            }
-        }
-
-        // Settings Modal Functions
-        function toggleSettingsModal() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
-        }
-
-        function saveBotSettings() {
-            botToken = document.getElementById('bot-token').value.trim();
-            chatId = document.getElementById('chat-id').value.trim();
-            const newPass = document.getElementById('new-admin-pass').value.trim();
-            
-            localStorage.setItem('tg_bot_token', botToken);
-            localStorage.setItem('tg_chat_id', chatId);
-
-            if(newPass) {
-                adminPassword = newPass;
-                localStorage.setItem('admin_pass', newPass);
-                document.getElementById('new-admin-pass').value = '';
-                alert('Telegram Bot မူလဆက်တင်များနှင့် Admin Password ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
-            } else {
-                alert('Telegram Bot မူလဆက်တင်များကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
-            }
-            
-            toggleSettingsModal();
-        }
+        console.log('🏗️ 智能仓库管理系统 v2.0 已启动');
+        console.log(`📦 当前库存: ${products.length} 种商品`);
     </script>
+
 </body>
 </html>
-```
